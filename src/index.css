@@ -3,12 +3,43 @@
   line-height: 1.5;
   font-weight: 400;
   color-scheme: light dark;
-  color: #213547;
-  background-color: #ffffff;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
+  --bg: #f4f7f4;
+  --surface: #ffffff;
+  --text: #1d2b22;
+  --text-muted: #5c6d61;
+  --border: #d8e2da;
+  --green: #2e7d46;
+  --green-strong: #226237;
+  --green-soft: #e5f2e9;
+  --red: #b4453a;
+  --amber: #9a6b12;
+
+  color: var(--text);
+  background-color: var(--bg);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #121a14;
+    --surface: #1c261f;
+    --text: #e8efe9;
+    --text-muted: #9db0a2;
+    --border: #334137;
+    --green: #58b174;
+    --green-strong: #74c78d;
+    --green-soft: #24332a;
+    --red: #e08078;
+    --amber: #d3a24a;
+  }
+}
+
+* {
+  box-sizing: border-box;
 }
 
 body {
@@ -18,15 +49,355 @@ body {
 }
 
 #root {
-  max-width: 1280px;
+  max-width: 720px;
   margin: 0 auto;
-  padding: 2rem;
+  padding: 1.5rem 1rem 3rem;
+}
+
+/* Header */
+
+.app-header {
+  text-align: center;
+  margin-bottom: 1.25rem;
+}
+
+.app-header h1 {
+  margin: 0;
+  font-size: 1.9rem;
+  color: var(--green-strong);
+}
+
+.tagline {
+  margin: 0.25rem 0 0;
+  color: var(--text-muted);
+}
+
+/* Stats */
+
+.stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: center;
+  margin-bottom: 1.25rem;
+}
+
+.stat {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 0.5rem 0.9rem;
+  min-width: 5.5rem;
   text-align: center;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    color: #f9fafb;
-    background-color: #111827;
+.stat-value {
+  display: block;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--green-strong);
+}
+
+.stat-value small {
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.stat-label {
+  display: block;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+}
+
+/* Form */
+
+.round-form {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1rem 1.1rem 1.1rem;
+  margin-bottom: 1.5rem;
+}
+
+.round-form h2 {
+  margin: 0 0 0.75rem;
+  font-size: 1.15rem;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 0.6rem 0.75rem;
+  margin-bottom: 0.6rem;
+}
+
+.form-grid .span-2 {
+  grid-column: span 2;
+}
+
+@media (max-width: 420px) {
+  .form-grid .span-2 {
+    grid-column: span 1;
   }
+}
+
+label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+label.full {
+  margin-bottom: 0.6rem;
+}
+
+input,
+select,
+textarea {
+  font: inherit;
+  font-weight: 400;
+  color: var(--text);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.45rem 0.6rem;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  outline: 2px solid var(--green);
+  outline-offset: 0;
+  border-color: transparent;
+}
+
+textarea {
+  resize: vertical;
+}
+
+button {
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.45rem 0.9rem;
+  background: var(--surface);
+  color: var(--text);
+}
+
+button:hover {
+  border-color: var(--green);
+}
+
+button.primary {
+  background: var(--green);
+  border-color: var(--green);
+  color: #fff;
+}
+
+button.primary:hover {
+  background: var(--green-strong);
+}
+
+button.primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+button.danger {
+  color: var(--red);
+}
+
+button.danger:hover {
+  border-color: var(--red);
+}
+
+.link-btn {
+  background: none;
+  border: none;
+  padding: 0.2rem 0;
+  color: var(--green);
+  font-size: 0.85rem;
+}
+
+.link-btn:hover {
+  text-decoration: underline;
+}
+
+.form-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+/* Rounds list */
+
+.search {
+  width: 100%;
+  margin-bottom: 0.75rem;
+}
+
+.rounds {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.empty {
+  text-align: center;
+  color: var(--text-muted);
+  padding: 1.5rem 0;
+}
+
+.round-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.round-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background: none;
+  border: none;
+  border-radius: 0;
+  text-align: left;
+}
+
+.round-card-header:hover {
+  background: var(--green-soft);
+}
+
+.round-card-main {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.round-course {
+  font-weight: 700;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.round-date {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.round-card-score {
+  display: flex;
+  align-items: baseline;
+  gap: 0.4rem;
+  flex-shrink: 0;
+}
+
+.round-score {
+  font-size: 1.4rem;
+  font-weight: 800;
+}
+
+.round-topar {
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.round-topar.under {
+  color: var(--red);
+}
+
+.round-topar.even,
+.round-topar.over {
+  color: var(--text-muted);
+}
+
+.round-card-body {
+  padding: 0 1rem 0.9rem;
+  border-top: 1px solid var(--border);
+}
+
+.round-stats {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1rem;
+  padding: 0.7rem 0 0;
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.round-stats strong {
+  color: var(--text);
+}
+
+.round-meta {
+  margin: 0.6rem 0 0;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.round-journal {
+  margin-top: 0.6rem;
+  font-size: 0.9rem;
+}
+
+.round-journal p {
+  margin: 0.35rem 0;
+  white-space: pre-wrap;
+}
+
+.journal-label {
+  display: inline-block;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0.05rem 0.4rem;
+  margin-right: 0.35rem;
+}
+
+.journal-label.good {
+  color: var(--green-strong);
+  border-color: var(--green);
+}
+
+.journal-label.work {
+  color: var(--amber);
+  border-color: var(--amber);
+}
+
+.round-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.8rem;
+}
+
+.round-actions button {
+  font-size: 0.85rem;
+  padding: 0.3rem 0.7rem;
+}
+
+/* Footer */
+
+.app-footer {
+  margin-top: 2rem;
+  text-align: center;
+  font-size: 0.8rem;
+  color: var(--text-muted);
 }
