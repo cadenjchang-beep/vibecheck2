@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import { formatDate } from './RoundCard'
+import { TrophyIcon } from './icons'
 import type { GolfRound, Tournament, TournamentDraft } from './types'
 import { formatToPar, toPar } from './types'
 
@@ -63,7 +64,10 @@ function TournamentCard({
         aria-expanded={expanded}
       >
         <div className="round-card-main">
-          <span className="round-course">🏆 {tournament.name}</span>
+          <span className="round-course">
+            <TrophyIcon size={16} />
+            {tournament.name}
+          </span>
           <span className="round-date">
             {formatDate(tournament.startDate)}
             {tournament.endDate ? ` – ${formatDate(tournament.endDate)}` : ''}
@@ -232,7 +236,7 @@ export default function Tournaments({ tournaments, rounds, onSave, onDelete }: P
       <section className="rounds" aria-label="Tournaments">
         {sorted.length === 0 ? (
           <p className="empty">
-            No tournaments yet. Add an event here, then link rounds to it when you log them. 🏆
+            No tournaments yet. Add an event here, then link rounds to it when you log them.
           </p>
         ) : (
           sorted.map((t) => (

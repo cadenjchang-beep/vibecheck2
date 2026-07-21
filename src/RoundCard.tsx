@@ -19,13 +19,13 @@ export function formatDate(date: string): string {
   })
 }
 
-function scoreClass(strokes: number, par: number): string {
+function scoreMark(strokes: number, par: number): string {
   const d = strokes - par
-  if (d <= -2) return 'hole-eagle'
-  if (d === -1) return 'hole-birdie'
-  if (d === 0) return ''
-  if (d === 1) return 'hole-bogey'
-  return 'hole-double'
+  if (d <= -2) return 'eagle'
+  if (d === -1) return 'birdie'
+  if (d === 0) return 'par'
+  if (d === 1) return 'bogey'
+  return 'double'
 }
 
 function MiniScorecard({ round }: { round: GolfRound }) {
@@ -56,8 +56,8 @@ function MiniScorecard({ round }: { round: GolfRound }) {
               <tr>
                 <th>Score</th>
                 {nine.map((h, i) => (
-                  <td key={i} className={scoreClass(h.strokes, h.par)}>
-                    {h.strokes}
+                  <td key={i}>
+                    <span className={`sc ${scoreMark(h.strokes, h.par)}`}>{h.strokes}</span>
                   </td>
                 ))}
                 <td className="scorecard-total">{nine.reduce((s, h) => s + h.strokes, 0)}</td>

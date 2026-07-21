@@ -241,7 +241,7 @@ export default function Practice({ sessions, onSave, onDelete }: Props) {
 
       <section className="rounds" aria-label="Practice sessions">
         {sorted.length === 0 ? (
-          <p className="empty">No practice logged yet. Range time counts double if you write it down. 🏌️</p>
+          <p className="empty">No practice logged yet. Range time counts double if you write it down.</p>
         ) : (
           sorted.map((s) => (
             <SessionCard

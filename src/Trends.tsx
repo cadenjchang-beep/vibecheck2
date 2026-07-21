@@ -15,7 +15,7 @@ function chartLabel(date: string): string {
 
 export default function Trends({ rounds }: Props) {
   if (rounds.length === 0) {
-    return <p className="empty">Log some rounds and your trends will show up here. 📈</p>
+    return <p className="empty">Log some rounds and your trends will show up here.</p>
   }
 
   const chrono = [...rounds].sort((a, b) =>
