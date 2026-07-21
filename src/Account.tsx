@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { CloudIcon } from './icons'
 import type { CloudSync } from './useCloudSync'
 
 interface Props {
@@ -13,7 +14,7 @@ export default function Account({ sync }: Props) {
   if (sync.status === 'disabled') {
     return (
       <section className="round-form" aria-label="Cloud sync">
-        <h2>☁️ Cloud sync</h2>
+        <h2><CloudIcon /> Cloud sync</h2>
         <p className="round-meta">
           Cloud sync is not configured for this deployment. To enable it, create a free Supabase
           project, run <code>supabase/schema.sql</code> in its SQL editor, and set{' '}
@@ -28,7 +29,7 @@ export default function Account({ sync }: Props) {
   if (sync.email) {
     return (
       <section className="round-form" aria-label="Cloud sync">
-        <h2>☁️ Cloud sync</h2>
+        <h2><CloudIcon /> Cloud sync</h2>
         <p className="round-meta">
           Signed in as <strong>{sync.email}</strong> — your journal syncs across every device
           where you sign in.

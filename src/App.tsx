@@ -6,6 +6,7 @@ import RoundForm from './RoundForm'
 import Stats from './Stats'
 import Tournaments from './Tournaments'
 import Trends from './Trends'
+import { BallIcon, ChartIcon, FlagIcon, GearIcon, LogoMark, TrophyIcon } from './icons'
 import { loadData, saveData } from './storage'
 import { useCloudSync } from './useCloudSync'
 import type {
@@ -22,12 +23,12 @@ import { ROUND_TYPE_LABELS } from './types'
 
 type Tab = 'rounds' | 'practice' | 'tournaments' | 'trends' | 'more'
 
-const TABS: { id: Tab; label: string }[] = [
-  { id: 'rounds', label: '⛳ Rounds' },
-  { id: 'practice', label: '🏌️ Practice' },
-  { id: 'tournaments', label: '🏆 Events' },
-  { id: 'trends', label: '📈 Trends' },
-  { id: 'more', label: '⚙️ More' },
+const TABS: { id: Tab; label: string; Icon: typeof FlagIcon }[] = [
+  { id: 'rounds', label: 'Rounds', Icon: FlagIcon },
+  { id: 'practice', label: 'Practice', Icon: BallIcon },
+  { id: 'tournaments', label: 'Events', Icon: TrophyIcon },
+  { id: 'trends', label: 'Trends', Icon: ChartIcon },
+  { id: 'more', label: 'More', Icon: GearIcon },
 ]
 
 function App() {
@@ -137,8 +138,11 @@ function App() {
   return (
     <div className="app">
       <header className="app-header">
-        <h1>⛳ Golf Journal</h1>
-        <p className="tagline">Rounds · practice · tournaments · trends</p>
+        <div className="wordmark">
+          <LogoMark size={38} className="logo" />
+          <span className="wordmark-text">Golf Journal</span>
+        </div>
+        <p className="tagline">Rounds · Practice · Tournaments · Analytics</p>
       </header>
 
       <nav className="tabs" aria-label="Sections">
@@ -148,7 +152,9 @@ function App() {
             type="button"
             className={tab === t.id ? 'tab active' : 'tab'}
             onClick={() => setTab(t.id)}
+            aria-current={tab === t.id ? 'page' : undefined}
           >
+            <t.Icon size={17} />
             {t.label}
           </button>
         ))}
@@ -190,7 +196,7 @@ function App() {
               </div>
             )}
             {data.rounds.length === 0 ? (
-              <p className="empty">No rounds yet — log your first one above. 🏌️</p>
+              <p className="empty">No rounds yet — log your first one above.</p>
             ) : visible.length === 0 ? (
               <p className="empty">No rounds match your search.</p>
             ) : (

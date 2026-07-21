@@ -35,6 +35,8 @@ export default function LineChart({ title, points, zeroLine = false, formatValue
   const x = (i: number) => PAD_X + i * STEP
 
   const path = points.map((p, i) => `${i === 0 ? 'M' : 'L'}${x(i)},${y(p.value)}`).join(' ')
+  const baseY = H - PAD_Y
+  const area = `${path} L${x(points.length - 1)},${baseY} L${x(0)},${baseY} Z`
 
   return (
     <div className="chart-card">
@@ -54,6 +56,7 @@ export default function LineChart({ title, points, zeroLine = false, formatValue
           {zeroLine && min < 0 && max > 0 && (
             <line x1={PAD_X - 6} y1={y(0)} x2={width - PAD_X + 6} y2={y(0)} className="chart-zero" />
           )}
+          <path d={area} className="chart-area" stroke="none" />
           <path d={path} className="chart-line" fill="none" />
           {points.map((p, i) => (
             <g key={i}>

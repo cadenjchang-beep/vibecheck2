@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react'
 import Account from './Account'
+import { BagIcon, DownloadIcon, TargetIcon } from './icons'
 import { exportData, parseImport } from './storage'
 import type { Club, Goal, JournalData } from './types'
 import type { CloudSync } from './useCloudSync'
@@ -89,7 +90,7 @@ export default function More({ data, sync, onReplaceData, onUpdateClubs, onUpdat
       <Account sync={sync} />
 
       <section className="round-form" aria-label="Goals">
-        <h2>🎯 Goals</h2>
+        <h2><TargetIcon /> Goals</h2>
         <form onSubmit={addGoal} className="inline-form">
           <input
             type="text"
@@ -142,7 +143,7 @@ export default function More({ data, sync, onReplaceData, onUpdateClubs, onUpdat
       </section>
 
       <section className="round-form" aria-label="My bag">
-        <h2>🎒 My bag — club distances</h2>
+        <h2><BagIcon /> My bag — club distances</h2>
         <form onSubmit={addClub} className="inline-form">
           <input
             type="text"
@@ -202,7 +203,7 @@ export default function More({ data, sync, onReplaceData, onUpdateClubs, onUpdat
       </section>
 
       <section className="round-form" aria-label="Backup and restore">
-        <h2>💾 Backup & restore</h2>
+        <h2><DownloadIcon /> Backup & restore</h2>
         <p className="round-meta">
           Your journal lives in this browser. Export a backup file regularly, or move your data to
           another device by importing it there.
