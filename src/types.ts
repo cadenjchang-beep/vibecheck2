@@ -37,9 +37,10 @@ export interface GolfRound {
   workOns?: string
   notes?: string
   createdAt: number
+  updatedAt?: number
 }
 
-export type RoundDraft = Omit<GolfRound, 'id' | 'createdAt'>
+export type RoundDraft = Omit<GolfRound, 'id' | 'createdAt' | 'updatedAt'>
 
 export interface Tournament {
   id: string
@@ -51,9 +52,10 @@ export interface Tournament {
   fieldSize?: number
   notes?: string
   createdAt: number
+  updatedAt?: number
 }
 
-export type TournamentDraft = Omit<Tournament, 'id' | 'createdAt'>
+export type TournamentDraft = Omit<Tournament, 'id' | 'createdAt' | 'updatedAt'>
 
 export type PracticeType =
   | 'range'
@@ -87,9 +89,10 @@ export interface PracticeSession {
   rating?: number // 1-5 session quality
   notes?: string
   createdAt: number
+  updatedAt?: number
 }
 
-export type PracticeDraft = Omit<PracticeSession, 'id' | 'createdAt'>
+export type PracticeDraft = Omit<PracticeSession, 'id' | 'createdAt' | 'updatedAt'>
 
 export interface Club {
   id: string
@@ -97,6 +100,7 @@ export interface Club {
   carry?: number
   total?: number
   notes?: string
+  updatedAt?: number
 }
 
 export interface Goal {
@@ -105,6 +109,7 @@ export interface Goal {
   targetDate?: string
   achieved: boolean
   createdAt: number
+  updatedAt?: number
 }
 
 export interface JournalData {

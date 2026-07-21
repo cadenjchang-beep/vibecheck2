@@ -1,9 +1,12 @@
 import { useRef, useState } from 'react'
+import Account from './Account'
 import { exportData, parseImport } from './storage'
 import type { Club, Goal, JournalData } from './types'
+import type { CloudSync } from './useCloudSync'
 
 interface Props {
   data: JournalData
+  sync: CloudSync
   onReplaceData: (data: JournalData) => void
   onUpdateClubs: (clubs: Club[]) => void
   onUpdateGoals: (goals: Goal[]) => void
@@ -16,7 +19,7 @@ function optionalNum(value: string): number | undefined {
   return Number.isFinite(n) ? n : undefined
 }
 
-export default function More({ data, onReplaceData, onUpdateClubs, onUpdateGoals }: Props) {
+export default function More({ data, sync, onReplaceData, onUpdateClubs, onUpdateGoals }: Props) {
   const [goalText, setGoalText] = useState('')
   const [goalDate, setGoalDate] = useState('')
   const [clubName, setClubName] = useState('')
@@ -37,6 +40,7 @@ export default function More({ data, onReplaceData, onUpdateClubs, onUpdateGoals
         targetDate: goalDate || undefined,
         achieved: false,
         createdAt: Date.now(),
+        updatedAt: Date.now(),
       },
     ])
     setGoalText('')
@@ -53,6 +57,7 @@ export default function More({ data, onReplaceData, onUpdateClubs, onUpdateGoals
         name: clubName.trim(),
         carry: optionalNum(clubCarry),
         total: optionalNum(clubTotal),
+        updatedAt: Date.now(),
       },
     ])
     setClubName('')
@@ -81,6 +86,8 @@ export default function More({ data, onReplaceData, onUpdateClubs, onUpdateGoals
 
   return (
     <>
+      <Account sync={sync} />
+
       <section className="round-form" aria-label="Goals">
         <h2>🎯 Goals</h2>
         <form onSubmit={addGoal} className="inline-form">
@@ -109,7 +116,9 @@ export default function More({ data, onReplaceData, onUpdateClubs, onUpdateGoals
                   onChange={(e) =>
                     onUpdateGoals(
                       data.goals.map((x) =>
-                        x.id === g.id ? { ...x, achieved: e.target.checked } : x,
+                        x.id === g.id
+                          ? { ...x, achieved: e.target.checked, updatedAt: Date.now() }
+                          : x,
                       ),
                     )
                   }

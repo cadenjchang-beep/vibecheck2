@@ -38,6 +38,34 @@ export function saveData(data: JournalData): void {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(data))
 }
 
+const META_KEY = 'golf-journal-sync-meta'
+
+export interface SyncMeta {
+  /** Remote updated_at we last pulled or pushed; null before the first sync. */
+  lastSyncedAt: string | null
+  /** True when local data changed and has not been pushed yet. */
+  dirty: boolean
+}
+
+export function loadSyncMeta(): SyncMeta {
+  try {
+    const raw = localStorage.getItem(META_KEY)
+    if (raw) {
+      const parsed = JSON.parse(raw)
+      if (parsed && typeof parsed === 'object') {
+        return { lastSyncedAt: parsed.lastSyncedAt ?? null, dirty: Boolean(parsed.dirty) }
+      }
+    }
+  } catch {
+    // fall through
+  }
+  return { lastSyncedAt: null, dirty: false }
+}
+
+export function saveSyncMeta(meta: SyncMeta): void {
+  localStorage.setItem(META_KEY, JSON.stringify(meta))
+}
+
 export function exportData(data: JournalData): void {
   const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' })
   const url = URL.createObjectURL(blob)

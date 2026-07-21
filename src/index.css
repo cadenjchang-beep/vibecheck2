@@ -826,3 +826,36 @@ button.small {
 .import-confirm p {
   margin: 0 0 0.5rem;
 }
+
+/* Cloud sync */
+
+.sync-status {
+  font-size: 0.85rem;
+  margin: 0.4rem 0 0.6rem;
+  font-weight: 600;
+}
+
+.sync-synced {
+  color: var(--green-strong);
+}
+
+.sync-syncing {
+  color: var(--text-muted);
+}
+
+.sync-error {
+  color: var(--red);
+}
+
+.sync-info {
+  color: var(--green-strong);
+  font-size: 0.85rem;
+}
+
+code {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 0.05rem 0.3rem;
+  font-size: 0.85em;
+}

@@ -7,6 +7,7 @@ import Stats from './Stats'
 import Tournaments from './Tournaments'
 import Trends from './Trends'
 import { loadData, saveData } from './storage'
+import { useCloudSync } from './useCloudSync'
 import type {
   Club,
   Goal,
@@ -41,6 +42,8 @@ function App() {
     saveData(data)
   }, [data])
 
+  const sync = useCloudSync(data, setData)
+
   const sorted = useMemo(
     () =>
       [...data.rounds].sort((a, b) =>
@@ -67,13 +70,18 @@ function App() {
     if (editing) {
       setData((d) => ({
         ...d,
-        rounds: d.rounds.map((r) => (r.id === editing.id ? { ...r, ...draft } : r)),
+        rounds: d.rounds.map((r) =>
+          r.id === editing.id ? { ...r, ...draft, updatedAt: Date.now() } : r,
+        ),
       }))
       setEditing(null)
     } else {
       setData((d) => ({
         ...d,
-        rounds: [...d.rounds, { ...draft, id: crypto.randomUUID(), createdAt: Date.now() }],
+        rounds: [
+          ...d.rounds,
+          { ...draft, id: crypto.randomUUID(), createdAt: Date.now(), updatedAt: Date.now() },
+        ],
       }))
     }
   }
@@ -92,8 +100,13 @@ function App() {
     setData((d) => ({
       ...d,
       practice: editingId
-        ? d.practice.map((p) => (p.id === editingId ? { ...p, ...draft } : p))
-        : [...d.practice, { ...draft, id: crypto.randomUUID(), createdAt: Date.now() }],
+        ? d.practice.map((p) =>
+            p.id === editingId ? { ...p, ...draft, updatedAt: Date.now() } : p,
+          )
+        : [
+            ...d.practice,
+            { ...draft, id: crypto.randomUUID(), createdAt: Date.now(), updatedAt: Date.now() },
+          ],
     }))
   }
 
@@ -101,8 +114,13 @@ function App() {
     setData((d) => ({
       ...d,
       tournaments: editingId
-        ? d.tournaments.map((t) => (t.id === editingId ? { ...t, ...draft } : t))
-        : [...d.tournaments, { ...draft, id: crypto.randomUUID(), createdAt: Date.now() }],
+        ? d.tournaments.map((t) =>
+            t.id === editingId ? { ...t, ...draft, updatedAt: Date.now() } : t,
+          )
+        : [
+            ...d.tournaments,
+            { ...draft, id: crypto.randomUUID(), createdAt: Date.now(), updatedAt: Date.now() },
+          ],
     }))
   }
 
@@ -111,7 +129,7 @@ function App() {
       ...d,
       tournaments: d.tournaments.filter((t) => t.id !== id),
       rounds: d.rounds.map((r) =>
-        r.tournamentId === id ? { ...r, tournamentId: undefined } : r,
+        r.tournamentId === id ? { ...r, tournamentId: undefined, updatedAt: Date.now() } : r,
       ),
     }))
   }
@@ -214,6 +232,7 @@ function App() {
       {tab === 'more' && (
         <More
           data={data}
+          sync={sync}
           onReplaceData={setData}
           onUpdateClubs={(clubs: Club[]) => setData((d) => ({ ...d, clubs }))}
           onUpdateGoals={(goals: Goal[]) => setData((d) => ({ ...d, goals }))}
@@ -221,7 +240,9 @@ function App() {
       )}
 
       <footer className="app-footer">
-        Data is saved locally in this browser — back it up from the More tab.
+        {sync.email
+          ? `Syncing to the cloud as ${sync.email}.`
+          : 'Data is saved locally in this browser — sync or back it up from the More tab.'}
       </footer>
     </div>
   )
