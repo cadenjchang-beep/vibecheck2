@@ -1,13 +1,14 @@
 import { useMemo, useState } from 'react'
+import Agenda from './Agenda'
 import EventEditor from './EventEditor'
-import { CalendarIcon, ChevronLeftIcon, ChevronRightIcon, PinIcon, PlusIcon, RepeatIcon } from './icons'
+import { colorFor, EventRow } from './EventRow'
+import { CalendarIcon, ChevronLeftIcon, ChevronRightIcon, PlusIcon } from './icons'
 import {
   addDays,
   addMonths,
   formatDayMonth,
   formatMonthYear,
   formatShortWeekday,
-  formatTime,
   isToday,
   startOfDay,
   startOfMonth,
@@ -54,18 +55,13 @@ export default function CalendarView({ data, setData, me, focusId }: Props) {
     return Array.from({ length: 42 }, (_, i) => addDays(gridStart, i))
   }, [anchor])
 
-  const upcoming = useMemo(
-    () => expandEvents(data.events, startOfDay(new Date()), addMonths(new Date(), 3)),
-    [data.events],
-  )
-
   const step = (amount: number) => {
     if (mode === 'month') setAnchor(addMonths(anchor, amount))
     else if (mode === 'week') setAnchor(addDays(anchor, amount * 7))
     else setAnchor(addDays(anchor, amount))
   }
 
-  const title = mode === 'list' ? 'Upcoming' : formatMonthYear(anchor)
+  const title = formatMonthYear(anchor)
 
   return (
     <div className="screen">
@@ -182,12 +178,11 @@ export default function CalendarView({ data, setData, me, focusId }: Props) {
       )}
 
       {mode === 'list' && (
-        <DayList
-          occurrences={upcoming}
+        <Agenda
+          events={data.events}
           members={data.members}
-          showDates
           onOpen={(o) => setEditing({ event: o.event, occurrenceStart: o.occurrenceStart })}
-          onCreate={() => setEditing({ event: null, occurrenceStart: defaultStart(anchor) })}
+          onCreate={() => setEditing({ event: null, occurrenceStart: defaultStart(new Date()) })}
         />
       )}
 
@@ -212,11 +207,6 @@ function defaultStart(anchor: Date): Date {
   const next = new Date(base)
   next.setHours(Math.min(next.getHours() + 1, 22), 0, 0, 0)
   return next
-}
-
-function colorFor(event: TendEvent, members: Member[]): string {
-  const attendee = members.find((m) => event.attendeeIds.includes(m.id))
-  return attendee?.colorHex ?? 'var(--accent)'
 }
 
 function DayList({
@@ -255,40 +245,3 @@ function DayList({
   )
 }
 
-function EventRow({
-  occurrence,
-  members,
-  showDate,
-  onOpen,
-}: {
-  occurrence: ExpandedEvent
-  members: Member[]
-  showDate?: boolean
-  onOpen(): void
-}) {
-  const { event, start } = occurrence
-  const attendees = members.filter((m) => event.attendeeIds.includes(m.id))
-  const when = event.isAllDay ? 'All day' : formatTime(start)
-
-  return (
-    <button className="event-row" onClick={onOpen}>
-      <span className="event-stripe" style={{ background: colorFor(event, members) }} />
-      <span className="event-body">
-        <span className="event-title">{event.title}</span>
-        <span className="event-meta muted small">
-          {showDate ? `${formatShortWeekday(start)} ${formatDayMonth(start)} · ${when}` : when}
-          {event.location ? ` · ${event.location}` : ''}
-          {event.recurrenceRule && <RepeatIcon size={12} />}
-          {occurrence.isDetached && <PinIcon size={12} />}
-        </span>
-      </span>
-      <span className="avatars">
-        {attendees.slice(0, 3).map((m) => (
-          <span key={m.id} className="avatar" style={{ background: m.colorHex }} title={m.name}>
-            {m.name.slice(0, 1).toUpperCase()}
-          </span>
-        ))}
-      </span>
-    </button>
-  )
-}

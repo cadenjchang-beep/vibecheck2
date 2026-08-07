@@ -165,15 +165,24 @@ function TaskRow({
   onDelete(): void
 }) {
   const assignee = members.find((m) => m.id === task.assignedTo)
+  // Amber, not red: overdue is a fact worth noticing, not a failure to feel
+  // bad about — the same "visibility, not judgment" instinct Load View runs on.
+  const isOverdue = !task.isComplete && Boolean(task.dueDate) && new Date(task.dueDate!) < startOfDay(new Date())
+
   return (
-    <li className="item-row">
+    <li className={`item-row ${isOverdue ? 'is-overdue' : ''}`}>
       <button className="icon-btn" onClick={onToggle} aria-label={task.isComplete ? 'Reopen' : 'Mark done'}>
         {task.isComplete ? <CheckCircleIcon /> : <CircleIcon />}
       </button>
       <button className="item-main" onClick={onOpen}>
         <span className={task.isComplete ? 'struck' : ''}>{task.title}</span>
         <span className="muted small">
-          {task.dueDate && formatDayMonth(new Date(task.dueDate))}
+          {task.dueDate && (
+            <span className={isOverdue ? 'text-warn' : undefined}>
+              {isOverdue && <span className="warn-dot" aria-hidden="true" />}
+              {formatDayMonth(new Date(task.dueDate))}
+            </span>
+          )}
           {task.recurrenceRule && <RepeatIcon size={12} />}
           {task.priority > 0 && ` · ${PRIORITY_LABELS[task.priority]}`}
         </span>

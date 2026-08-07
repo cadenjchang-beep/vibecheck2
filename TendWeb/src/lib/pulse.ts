@@ -28,9 +28,16 @@ export interface PulseSnapshot {
   lines: PulseLine[]
 }
 
-/** Morning before 4pm, the weekly recap after — matching the two moments Pulse is for. */
+/**
+ * Morning, every day — the weekly recap only Sunday evening.
+ *
+ * The weekly copy talks about "this week", "next week" and "left this
+ * weekend" — language that's only true right before the week turns over.
+ * Gating on hour alone (any evening) would show that language on a Tuesday
+ * night, where "next week: 4 events" quietly means "the rest of this week".
+ */
 export function pulseKindFor(now = new Date()): PulseKind {
-  return now.getHours() >= 16 ? 'weekly' : 'morning'
+  return now.getDay() === 0 && now.getHours() >= 16 ? 'weekly' : 'morning'
 }
 
 export function generatePulse(data: HouseholdData, kind: PulseKind, now = new Date()): PulseSnapshot {

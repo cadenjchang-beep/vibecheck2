@@ -14,6 +14,11 @@ and they shape every decision here:
    the shape of the week in household order, with no rank and no verdict.
 3. **Re-entry is a top contributor.** Hence the PWA share target: share a flyer
    or a message into Tend and it arrives as a filled-in draft.
+4. **The household should be able to see everything at once, not just today.**
+   Calendar's **List** view (`Agenda.tsx`) is Cozi's "list view" done Tend's
+   way — every event, grouped by day, searchable and filterable by who it's
+   for, reaching a year ahead. Day/Week/Month answer "what's on"; Agenda
+   answers "what's coming".
 
 This is a port of the native iOS build in [`../Tend`](../Tend). The logic — the
 recurrence engine, the natural-language parser, aisle categorisation, Pulse and
@@ -35,9 +40,10 @@ no account and no backend. Every feature works except sharing a household with
 another person.
 
 ```bash
-npm test        # 74 unit tests — recurrence, parser, categoriser, Pulse, Load
-npm run build   # typecheck + production bundle
-npm run smoke   # end-to-end browser pass (needs `npm i -D playwright`)
+npm test                         # 93 unit tests — recurrence, parser, categoriser, Pulse, Load, Agenda
+npm run build                    # typecheck + production bundle
+npm run smoke                    # critical-path browser pass (needs `npm i -D playwright`)
+node scripts/smoke-agenda.mjs    # Agenda-specific browser pass — search, filters, empty states
 ```
 
 ## Turn on sharing (optional)
@@ -64,25 +70,31 @@ person, don't post it.
 ```
 src/
 ├── lib/
-│   ├── recurrence.ts   RRULE subset, expansion, and the edit-scope surgery
-│   ├── eventStore.ts   Applies a recurrence mutation to the events array
-│   ├── quickAdd.ts     Natural-language parser
-│   ├── aisles.ts       Curated keyword map for grocery categorisation
-│   ├── pulse.ts        The recap generator
-│   ├── load.ts         Load View computation, and its design rules
-│   ├── store.ts        List/task/meal operations — the one place flags flip
-│   └── dates.ts        Local-time helpers and all date formatting
-├── components/         One file per screen
-├── types.ts            The data model
-├── storage.ts          localStorage, migrations, export/import
-├── sync.ts             Supabase household sync and the merge
-└── useHouseholdSync.ts Offline-first pull/push
+│   ├── recurrence.ts    RRULE subset, expansion, and the edit-scope surgery
+│   ├── eventStore.ts    Applies a recurrence mutation to the events array
+│   ├── agenda.ts        Agenda's filtering, day-grouping and date labelling
+│   ├── quickAdd.ts      Natural-language parser
+│   ├── aisles.ts        Curated keyword map for grocery categorisation
+│   ├── pulse.ts         The recap generator
+│   ├── load.ts          Load View computation, and its design rules
+│   ├── store.ts         List/task/meal operations — the one place flags flip
+│   └── dates.ts         Local-time helpers and all date formatting
+├── components/
+│   ├── EventRow.tsx     The one row that renders an event — shared by
+│   │                    Day/Week/Month and Agenda so a meeting looks the
+│   │                    same wherever it's found
+│   ├── Agenda.tsx       The List view — see §4 above
+│   └── …                One file per screen otherwise
+├── types.ts             The data model
+├── storage.ts           localStorage, migrations, export/import
+├── sync.ts              Supabase household sync and the merge
+└── useHouseholdSync.ts  Offline-first pull/push
 ```
 
 Plain React state and hand-written CSS, matching the conventions of the existing
 app in this repo. No state library, no CSS framework, no component kit.
 
-### Three decisions worth knowing about
+### Four decisions worth knowing about
 
 **Recurrence runs on pure values.** `recurrence.ts` takes a snapshot and returns
 a `SeriesMutation` describing every write an edit implies; `eventStore.ts`
@@ -104,6 +116,45 @@ list check-offs came from Sam this time"), never prescriptive; and the caveat �
 *"This is only what Tend can see. Plenty of the work at home doesn't get logged
 anywhere."* — is part of the claim the chart makes, not a dismissible
 disclaimer. The tests assert the copy contains no comparative language.
+
+**Agenda's member filter is OR, not AND.** Selecting Sam and Alex shows events
+for *either* of them, not only events both attend — with most events having one
+or two attendees, an AND filter would mostly return nothing. `matchesFilter` in
+`agenda.ts` is the one place this is decided, and it's the first thing the test
+file for it asserts.
+
+---
+
+## Design system
+
+Colour, type and motion are tokens in `index.css`, extended (not replaced) from
+the app's original sage-and-paper palette:
+
+- **Colour** stays quiet on purpose — per-member colour is the app's real
+  visual language, so the neutral palette never competes with it. One semantic
+  addition: `--warn`, a separate amber tone from `--danger`, used only for
+  overdue tasks. Overdue is a fact worth noticing, not a red-alert failure to
+  feel bad about — the same "visibility, not judgment" instinct Load View runs
+  on, applied to a single dot and a line of text.
+- **Type** is Inter throughout, plus one restrained addition: `--font-display`
+  (Literata, a variable serif) on exactly two moments — the onboarding hero and
+  Pulse's daily headline. Everything operational — screen titles, buttons,
+  data, every input — stays in Inter, where legibility at small sizes matters
+  more than character.
+- **Motion** runs on one shared easing, `--ease-out`, so a sheet opening, a
+  Load View bar settling and a screen fading in all move with the same hand
+  rather than a different curve per component. Every transition and animation
+  respects `prefers-reduced-motion`.
+
+One thing tried and deliberately reverted: date-group headers in Agenda were
+originally `position: sticky`, pinned under the topbar while scrolling — until
+testing turned up a genuine Chromium rendering bug (confirmed by hand-computing
+the correct sticky offset and finding the browser's own number didn't match it,
+reproducibly, regardless of z-index, compositing hints, or flex-gap changes) that
+clipped a header's text against the topbar at certain scroll depths in long
+lists. Rather than ship an intermittent visual bug chasing a "nice to have",
+Agenda's headers are plain, non-sticky labels — the same pattern Lists' aisle
+headers and Tasks' due-date groups already use successfully.
 
 ---
 
@@ -130,15 +181,23 @@ VisionKit has no web counterpart.
 
 Unlike the iOS build, this one actually runs:
 
-- **74 unit tests** pass — recurrence expansion and all three edit scopes, the
-  parser, aisle categorisation, Pulse generation, Load computation.
+- **93 unit tests** pass — recurrence expansion and all three edit scopes, the
+  parser, aisle categorisation, Pulse generation, Load computation, Agenda's
+  filtering and day-grouping.
 - **Typechecks clean** under `strict` with `noUnusedLocals`.
-- **Builds** to ~85 KB gzipped.
-- **Browser smoke test** (`npm run smoke`) drives the critical path against a
-  real Chromium: onboarding → quick-add a recurring event → confirm the
-  scope prompt appears → add list items and confirm the field keeps focus →
-  check one off → confirm Load View reflects it in household order → reload and
-  confirm persistence.
+- **Builds** to ~91 KB gzipped (JS + CSS).
+- **Two browser smoke suites**, both against real Chromium:
+  - `npm run smoke` — the critical path: onboarding → quick-add a recurring
+    event → confirm the scope prompt appears → add list items and confirm the
+    field keeps focus → check one off → confirm Load View reflects it in
+    household order → reload and confirm persistence.
+  - `node scripts/smoke-agenda.mjs` — Agenda specifically: every seeded event
+    shows up grouped by day → search narrows the list and clears back →
+    the member filter hides the right person's events → a search with no
+    matches shows its own empty state → opening a row reaches the real event
+    editor → the past-events toggle works.
+- **Both themes eyeballed**, light and dark, including the display typeface and
+  the overdue-task treatment.
 
 Not verified: multi-device sync against a real Supabase project. That needs
 credentials this environment doesn't have.

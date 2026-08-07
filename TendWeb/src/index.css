@@ -8,6 +8,10 @@
 
 :root {
   --font-sans: 'Inter Variable', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  /* Used with restraint — the onboarding hero and Pulse's daily headline only.
+     Everything operational (screen titles, buttons, data) stays in Inter,
+     where legibility at small sizes matters more than character. */
+  --font-display: 'Literata Variable', ui-serif, Georgia, 'Times New Roman', serif;
 
   --paper: #f5f3ee;
   --surface: #fffefb;
@@ -24,11 +28,22 @@
   --accent-tint: #e6ede9;
   --on-accent: #fdfdfa;
   --danger: #a8503f;
+  --danger-tint: #f5e6e3;
+  /* A separate semantic tone from --danger: overdue is a fact worth noticing,
+     not a red-alert failure someone should feel bad about — Load View's whole
+     ethos (visibility, not judgment) applies here too. */
+  --warn: #8a5a12;
+  --warn-tint: #f2e6cf;
 
   --ring: rgba(108, 143, 126, 0.28);
   --shadow-sm: 0 1px 2px rgba(27, 33, 29, 0.06);
   --shadow-md: 0 6px 20px -10px rgba(27, 33, 29, 0.22);
   --shadow-lg: 0 24px 50px -20px rgba(27, 33, 29, 0.35);
+
+  /* The one settle-not-snap easing used everywhere something moves — sheets,
+     the Load View bars, chip toggles, screen transitions — so motion reads as
+     one consistent hand throughout, not a different curve per component. */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
 
   /* 8pt spacing grid, same as the iOS build. */
   --s1: 4px;
@@ -40,6 +55,10 @@
   --r-sm: 8px;
   --r-md: 12px;
   --r-lg: 18px;
+
+  /* The topbar's real height (8px padding + 36px button + 8px padding), so a
+     sticky date header can pin directly beneath it without a gap or overlap. */
+  --topbar-h: 52px;
 
   color-scheme: light dark;
   font-family: var(--font-sans);
@@ -66,6 +85,9 @@
     --accent-tint: #1e2a24;
     --on-accent: #101613;
     --danger: #e08574;
+    --danger-tint: #2c1d1a;
+    --warn: #d9a857;
+    --warn-tint: #2c2415;
 
     --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
     --shadow-md: 0 8px 24px -12px rgba(0, 0, 0, 0.6);
@@ -93,6 +115,7 @@ h3 {
 h1 {
   font-size: 1.6rem;
   letter-spacing: -0.02em;
+  text-wrap: balance;
 }
 h2 {
   font-size: 0.95rem;
@@ -104,6 +127,14 @@ h3 {
 
 p {
   margin: 0;
+}
+
+/* The one place a second typeface earns its keep — see --font-display. */
+.font-display {
+  font-family: var(--font-display);
+  font-weight: 480;
+  font-optical-sizing: auto;
+  letter-spacing: -0.01em;
 }
 
 .muted {
@@ -122,6 +153,19 @@ p {
 .dash {
   color: var(--faint);
   font-size: 0.85rem;
+}
+.text-warn {
+  color: var(--warn);
+  font-weight: 600;
+}
+.warn-dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--warn);
+  margin-right: 5px;
+  vertical-align: middle;
 }
 
 /* -- Shell ------------------------------------------------------------- */
@@ -217,6 +261,14 @@ p {
   flex-direction: column;
   gap: var(--s3);
   padding: var(--s3);
+  animation: screen-in 240ms var(--ease-out);
+}
+
+@keyframes screen-in {
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
 }
 
 .screen-head {
@@ -261,11 +313,15 @@ p {
   font-weight: 550;
   font-size: 0.9rem;
   cursor: pointer;
-  transition: background 120ms ease, transform 120ms ease;
+  transition:
+    background 160ms var(--ease-out),
+    border-color 160ms var(--ease-out),
+    box-shadow 160ms var(--ease-out),
+    transform 160ms var(--ease-out);
 }
 
-.btn:active {
-  transform: scale(0.985);
+.btn:active:not(:disabled) {
+  transform: scale(0.97);
 }
 
 .btn:disabled {
@@ -280,6 +336,7 @@ p {
 
 .btn-primary:hover:not(:disabled) {
   background: var(--accent-strong);
+  box-shadow: var(--shadow-sm);
 }
 
 .btn-quiet {
@@ -427,12 +484,17 @@ button:focus-visible {
   font: inherit;
   font-size: 0.85rem;
   cursor: pointer;
+  transition: background 160ms var(--ease-out), color 160ms var(--ease-out), box-shadow 160ms var(--ease-out);
 }
 
 .segmented button[aria-selected='true'] {
   background: var(--surface);
   color: var(--ink);
   box-shadow: var(--shadow-sm);
+}
+
+.segmented button:not([aria-selected='true']):hover {
+  color: var(--ink-soft);
 }
 
 .segmented .count {
@@ -485,10 +547,16 @@ button:focus-visible {
   font-size: 0.78rem;
   color: var(--ink-soft);
   cursor: default;
+  transition: background 160ms var(--ease-out), border-color 160ms var(--ease-out), color 160ms var(--ease-out);
 }
 
 button.chip {
   cursor: pointer;
+}
+
+button.chip:hover:not(.is-on) {
+  border-color: var(--line-strong);
+  background: var(--surface-2);
 }
 
 .chip.is-on {
@@ -637,7 +705,7 @@ button.chip {
   height: 100%;
   border-radius: var(--r-sm);
   /* Settles rather than snaps: a bouncy chart reads as a scoreboard. */
-  transition: width 600ms cubic-bezier(0.22, 1, 0.36, 1);
+  transition: width 600ms var(--ease-out);
 }
 
 .observation {
@@ -716,10 +784,19 @@ button.chip {
   gap: var(--s2);
   padding: 2px var(--s2) 2px var(--s3);
   border-bottom: 1px solid var(--line);
+  transition: background 120ms var(--ease-out);
 }
 
 .item-row:last-child {
   border-bottom: none;
+}
+
+.item-row:hover {
+  background: var(--surface-2);
+}
+
+.item-row.is-overdue {
+  background: color-mix(in srgb, var(--warn-tint) 55%, transparent);
 }
 
 .item-main {
@@ -784,6 +861,12 @@ button.chip {
   font: inherit;
   text-align: left;
   cursor: pointer;
+  transition: border-color 160ms var(--ease-out), box-shadow 160ms var(--ease-out);
+}
+
+.event-row:hover {
+  border-color: var(--line-strong);
+  box-shadow: var(--shadow-sm);
 }
 
 .event-stripe {
@@ -870,6 +953,145 @@ button.chip {
   border-radius: 50%;
 }
 
+/* -- Agenda -------------------------------------------------------------
+   The Cozi-style "everything, in one list" view — see lib/agenda.ts for the
+   filtering and grouping this renders. */
+
+.agenda-toolbar {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s2);
+}
+
+.search-field {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-field svg {
+  position: absolute;
+  left: 12px;
+  color: var(--faint);
+  pointer-events: none;
+}
+
+.search-field input {
+  padding-left: 38px;
+  padding-right: 34px;
+}
+
+.search-clear {
+  position: absolute;
+  right: 5px;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.search-clear:hover {
+  background: var(--surface-2);
+  color: var(--ink);
+}
+
+.member-filter {
+  display: flex;
+  gap: var(--s1);
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding-bottom: 1px;
+}
+
+.member-filter::-webkit-scrollbar {
+  display: none;
+}
+
+.member-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px 4px 6px;
+  border-radius: 999px;
+  border: 1px solid var(--line-strong);
+  background: var(--surface);
+  font-size: 0.8rem;
+  font-weight: 550;
+  color: var(--ink-soft);
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background 160ms var(--ease-out), border-color 160ms var(--ease-out), color 160ms var(--ease-out);
+}
+
+.member-chip:hover {
+  border-color: var(--line-strong);
+  background: var(--surface-2);
+}
+
+.member-chip .avatar {
+  width: 18px;
+  height: 18px;
+  font-size: 0.6rem;
+}
+
+.date-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s2);
+  scroll-margin-top: calc(var(--topbar-h) + 12px);
+}
+
+.date-group-head {
+  display: flex;
+  align-items: center;
+  gap: var(--s2);
+  padding: 2px 2px;
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.date-group-head.is-today {
+  color: var(--accent-strong);
+}
+
+.date-group-head .date-count {
+  font-weight: 500;
+  letter-spacing: normal;
+  text-transform: none;
+  color: var(--faint);
+}
+
+.jump-today {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border: none;
+  border-radius: 999px;
+  background: var(--accent-tint);
+  color: var(--accent-strong);
+  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.agenda-hint {
+  font-size: 0.8rem;
+  color: var(--muted);
+  text-align: center;
+  padding: var(--s2) 0;
+}
+
 /* -- Meals ------------------------------------------------------------- */
 
 .day-card {
@@ -920,7 +1142,7 @@ button.chip {
   background: var(--paper);
   border-radius: var(--r-lg) var(--r-lg) 0 0;
   box-shadow: var(--shadow-lg);
-  animation: sheet-in 260ms cubic-bezier(0.22, 1, 0.36, 1);
+  animation: sheet-in 260ms var(--ease-out);
 }
 
 @keyframes sheet-in {
@@ -931,10 +1153,18 @@ button.chip {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .sheet {
+  .sheet,
+  .screen,
+  .sync-syncing {
     animation: none;
   }
-  .load-fill {
+  .load-fill,
+  .btn,
+  .chip,
+  .item-row,
+  .event-row,
+  .segmented button,
+  .sync-dot {
     transition: none;
   }
 }
@@ -1057,6 +1287,17 @@ button.chip {
   color: var(--accent);
 }
 
+.onboarding h1 {
+  font-size: 1.9rem;
+}
+
+/* The one moment the display face gets to be genuinely large — a wordmark
+   shown exactly once, before anything else has earned the page's attention. */
+.tend-wordmark {
+  font-size: 2.75rem;
+  font-weight: 460;
+}
+
 .lede {
   color: var(--ink-soft);
   font-size: 1.02rem;
@@ -1123,6 +1364,7 @@ button.chip {
   height: 10px;
   border-radius: 50%;
   background: var(--faint);
+  transition: background 200ms var(--ease-out);
 }
 
 .sync-idle {

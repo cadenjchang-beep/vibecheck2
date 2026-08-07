@@ -48,7 +48,7 @@ export default function Onboarding({ data, onComplete }: Props) {
         <div className="onboarding-art" aria-hidden="true">
           <LeafIcon size={56} />
         </div>
-        <h1>Tend</h1>
+        <h1 className="font-display tend-wordmark">Tend</h1>
         <p className="lede">The app that carries what you're carrying in your head.</p>
         <button className="btn btn-primary" onClick={() => setPage(1)}>
           Show me
@@ -60,7 +60,7 @@ export default function Onboarding({ data, onComplete }: Props) {
   if (page === 1) {
     return (
       <div className="onboarding">
-        <h1>The invisible part</h1>
+        <h1 className="font-display">The invisible part</h1>
         <p className="lede">
           Every household runs on a list nobody wrote down — who needs what, when, and who's
           remembering it.

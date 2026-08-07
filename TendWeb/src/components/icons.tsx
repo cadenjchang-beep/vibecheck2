@@ -144,6 +144,26 @@ export const TrashIcon = (p: IconProps) => (
   </Svg>
 )
 
+export const SearchIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <circle cx="10.5" cy="10.5" r="6.5" />
+    <path d="M20 20l-4.8-4.8" />
+  </Svg>
+)
+
+export const CloseIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <path d="M6 6l12 12M18 6L6 18" />
+  </Svg>
+)
+
+export const ClockIcon = (p: IconProps) => (
+  <Svg {...p}>
+    <circle cx="12" cy="12" r="9" />
+    <path d="M12 7v5l3.5 2" />
+  </Svg>
+)
+
 export const ICONS: Record<string, (p: IconProps) => React.JSX.Element> = {
   calendar: CalendarIcon,
   check: CheckCircleIcon,

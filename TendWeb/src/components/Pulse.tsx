@@ -26,7 +26,7 @@ export default function Pulse({ data, onNavigate, onOpenLoad }: Props) {
   return (
     <div className="screen">
       <header className="screen-head">
-        <h1>{snapshot.headline}</h1>
+        <h1 className="font-display">{snapshot.headline}</h1>
         <p className="muted small">Updated {formatRelative(snapshot.generatedAt)}</p>
       </header>
 

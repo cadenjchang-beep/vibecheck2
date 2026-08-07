@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { categorize } from './aisles'
-import { compactSummary, generatePulse } from './pulse'
+import { compactSummary, generatePulse, pulseKindFor } from './pulse'
 import { CAVEAT, observationFor, summarizeLoad, weekWindow, type LoadShare } from './load'
 import { emptyData, type HouseholdData, type ListItem, type Task, type TendEvent } from '../types'
 
@@ -156,6 +156,24 @@ describe('weekly pulse', () => {
   it('flags an unplanned week ahead', () => {
     const snapshot = generatePulse(household(), 'weekly', NOW)
     expect(snapshot.lines.map((l) => l.text)).toContain('No meals planned yet for next week')
+  })
+})
+
+describe('pulseKindFor', () => {
+  it('is weekly only on Sunday evening', () => {
+    // Sunday 8 March 2026, 18:00.
+    expect(pulseKindFor(at(2026, 2, 8, 18))).toBe('weekly')
+  })
+
+  it('stays morning on a weekday evening', () => {
+    // The weekly copy says "this week" and "next week" — true on Sunday
+    // night, misleading on a Tuesday, so an evening filter alone isn't enough.
+    expect(pulseKindFor(NOW)).toBe('morning') // Wednesday, 07:00
+    expect(pulseKindFor(at(2026, 2, 4, 20))).toBe('morning') // Wednesday, 20:00
+  })
+
+  it('stays morning on Sunday before evening', () => {
+    expect(pulseKindFor(at(2026, 2, 8, 9))).toBe('morning')
   })
 })
 
