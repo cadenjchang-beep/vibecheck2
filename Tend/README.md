@@ -20,28 +20,27 @@ things follow from that, and they shape every decision in this codebase:
 
 ## Build
 
-The Xcode project is generated from [`project.yml`](project.yml) rather than
-committed — a five-target `.pbxproj` is a merge-conflict machine and is not
-reviewable.
+**Start at [SETUP.md](SETUP.md)** — it walks the whole thing from nothing,
+including the parts on Apple's websites that can't be scripted.
+
+The short version:
 
 ```bash
 brew install xcodegen
 cd Tend
-xcodegen generate
+Scripts/configure.sh com.yourname.tend YOURTEAMID
 open Tend.xcodeproj
 ```
 
-Before the first build, replace the placeholders in `project.yml` and
-`Support/*.entitlements`:
+`configure.sh` replaces every placeholder identifier — bundle IDs, the iCloud
+container, the app group, the background-task IDs — consistently across
+`project.yml`, the entitlements, the Info.plists and the Swift source, then
+generates the project. Those strings have to agree with each other and with what
+you register in the Developer portal; CloudKit will not provision against the
+placeholders.
 
-| Placeholder | Replace with |
-| --- | --- |
-| `TEAMID` | Your Apple Developer team ID |
-| `com.tend.household` | Your bundle identifier |
-| `iCloud.com.tend.household` | Your CloudKit container |
-| `group.com.tend.household` | Your app group |
-
-CloudKit will not provision against the placeholders.
+The Xcode project itself is generated rather than committed — a five-target
+`.pbxproj` is a merge-conflict machine and is not reviewable.
 
 Run the logic tests without Xcode:
 
