@@ -1,0 +1,25 @@
+{
+  "name": "Tend",
+  "short_name": "Tend",
+  "description": "The app that carries what you're carrying in your head.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#f5f3ee",
+  "theme_color": "#6c8f7e",
+  "icons": [
+    { "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "share_target": {
+    "action": "/",
+    "method": "GET",
+    "params": { "title": "title", "text": "text", "url": "url" }
+  },
+  "shortcuts": [
+    { "name": "Quick add", "url": "/?share=1", "description": "Capture something in one line" },
+    { "name": "Groceries", "url": "/?list=Groceries", "description": "Open the grocery list" }
+  ]
+}

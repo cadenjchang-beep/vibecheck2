@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Tend">
+  <rect width="512" height="512" rx="112" fill="#6c8f7e"/>
+  <path d="M136 392c176-22 232-116 244-280C232 112 132 178 132 288c0 38 8 74 24 104z"
+        fill="none" stroke="#f7f5ef" stroke-width="28" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M136 392c34-84 84-134 148-166"
+        fill="none" stroke="#f7f5ef" stroke-width="28" stroke-linecap="round"/>
+</svg>
