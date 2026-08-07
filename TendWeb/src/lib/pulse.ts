@@ -140,12 +140,13 @@ function weeklyPulse(data: HouseholdData, now: Date): PulseSnapshot {
       .filter((at) => at >= weekStart && at < weekEnd)
     if (!completions.length) continue
     const days = new Set(completions.map((at) => startOfDay(at).getTime())).size
+    const noun = completions.length === 1 ? 'item' : 'items'
     lines.push({
       id: `done-list-${listName}`,
       text:
         days === 1
-          ? `${listName} cleared ${completions.length} items`
-          : `${listName} cleared ${completions.length} items across ${days} trips`,
+          ? `${listName} cleared ${completions.length} ${noun}`
+          : `${listName} cleared ${completions.length} ${noun} across ${days} trips`,
       icon: 'cart',
       target: { tab: 'lists', listName },
     })

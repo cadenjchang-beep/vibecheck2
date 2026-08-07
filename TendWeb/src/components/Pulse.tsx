@@ -70,16 +70,21 @@ export default function Pulse({ data, onNavigate, onOpenLoad }: Props) {
           {load.householdTotal === 0 ? (
             <span className="spark spark-empty" />
           ) : (
-            load.shares.map((share) => (
-              <span
-                key={share.memberId}
-                className="spark"
-                style={{
-                  background: share.colorHex,
-                  width: `${Math.max(6, fractionOf(share, load.householdTotal) * 56)}px`,
-                }}
-              />
-            ))
+            // Someone who logged nothing gets no bar. A minimum-width sliver
+            // for a zero would read as "they did a little", which is a claim
+            // the data doesn't make.
+            load.shares
+              .filter((share) => share.total > 0)
+              .map((share) => (
+                <span
+                  key={share.memberId}
+                  className="spark"
+                  style={{
+                    background: share.colorHex,
+                    width: `${Math.max(6, fractionOf(share, load.householdTotal) * 56)}px`,
+                  }}
+                />
+              ))
           )}
         </span>
         <span className="load-card-text">

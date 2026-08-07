@@ -94,7 +94,14 @@ export function loadIdentity(): Identity {
 }
 
 export function saveIdentity(identity: Identity): void {
-  localStorage.setItem(IDENTITY_KEY, JSON.stringify(identity))
+  // Safari in private mode, and an embedded frame with storage blocked, both
+  // throw on `setItem`. Tend still works for the session in that case, so this
+  // must never take the app down.
+  try {
+    localStorage.setItem(IDENTITY_KEY, JSON.stringify(identity))
+  } catch (error) {
+    console.error('Could not save identity locally', error)
+  }
 }
 
 // -- Sync bookkeeping ---------------------------------------------------------
@@ -122,7 +129,11 @@ export function loadSyncMeta(): SyncMeta {
 }
 
 export function saveSyncMeta(meta: SyncMeta): void {
-  localStorage.setItem(SYNC_KEY, JSON.stringify(meta))
+  try {
+    localStorage.setItem(SYNC_KEY, JSON.stringify(meta))
+  } catch {
+    // Sync bookkeeping is recoverable on the next pull; never fatal.
+  }
 }
 
 // -- Export -------------------------------------------------------------------
