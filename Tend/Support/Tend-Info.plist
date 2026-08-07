@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleDisplayName</key>
+	<string>Tend</string>
+	<key>CFBundleShortVersionString</key>
+	<string>$(MARKETING_VERSION)</string>
+	<key>CFBundleVersion</key>
+	<string>$(CURRENT_PROJECT_VERSION)</string>
+
+	<key>UILaunchScreen</key>
+	<dict/>
+
+	<key>UISupportedInterfaceOrientations</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
+	</array>
+
+	<!-- Deep-link scheme shared by every widget, complication and Live Activity. -->
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>com.tend.household.deeplink</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>tend</string>
+			</array>
+		</dict>
+	</array>
+
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>fetch</string>
+		<string>processing</string>
+		<string>remote-notification</string>
+		<string>location</string>
+	</array>
+
+	<key>BGTaskSchedulerPermittedIdentifiers</key>
+	<array>
+		<string>com.tend.household.pulse-refresh</string>
+		<string>com.tend.household.region-refresh</string>
+	</array>
+
+	<key>NSSupportsLiveActivities</key>
+	<true/>
+	<key>NSSupportsLiveActivitiesFrequentUpdates</key>
+	<false/>
+
+	<!-- Purpose strings are written as the reason, not the mechanism: a person
+	     deciding whether to tap Allow needs to know what they get. -->
+	<key>NSFaceIDUsageDescription</key>
+	<string>Tend can lock itself, or just the sections you choose, so your household's plans stay private when you hand your phone over.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Tend uses your location only to remind you about list items when you're near the shop you saved them for.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>Location reminders need background access so Tend can nudge you when you arrive somewhere, even if the app isn't open. Your location never leaves your device.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Scan a recipe card or a school flyer and Tend reads it in, so nobody has to retype it.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Add a photo to a recipe, or import one from a picture you already have.</string>
+	<key>NSUserActivityTypes</key>
+	<array>
+		<string>AddListItemIntent</string>
+		<string>ToggleListItemIntent</string>
+		<string>QuickAddIntent</string>
+		<string>WhatsLeftIntent</string>
+	</array>
+
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
+</dict>
+</plist>
