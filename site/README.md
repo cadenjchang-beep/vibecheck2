@@ -156,6 +156,11 @@ them.
 
 ## Notes for Framer / Zite import
 
+**[`ZITE-PROMPT.md`](ZITE-PROMPT.md) is a ready-to-paste handoff prompt** — brand,
+design tokens, content model, template specs, behaviours to reimplement, the
+editorial non-negotiables, and an acceptance checklist. Paste it into Zite (or
+adapt it for Framer) with this folder attached.
+
 - **Self-contained.** No bundler, no imports beyond the Google Fonts link.
   Everything else is relative paths inside `site/`.
 - **Semantic and repetitive on purpose.** Cards, callouts, spec lists and rating
