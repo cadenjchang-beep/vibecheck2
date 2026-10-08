@@ -31,14 +31,20 @@ export default function Account({ sync }: Props) {
       <section className="round-form" aria-label="Cloud sync">
         <h2><CloudIcon /> Cloud sync</h2>
         <p className="round-meta">
-          Signed in as <strong>{sync.email}</strong> — your journal syncs across every device
-          where you sign in.
+          Signed in as <strong>{sync.email}</strong> — your journal and scorecard photos sync
+          across every device where you sign in.
         </p>
         <p className={`sync-status sync-${sync.status}`}>
           {sync.status === 'syncing' && 'Syncing…'}
           {sync.status === 'synced' && '✓ Up to date'}
           {sync.status === 'error' && `Sync problem: ${sync.error}`}
         </p>
+        {sync.photoError && (
+          <p className="import-error">
+            {sync.photoError}. Make sure the latest <code>supabase/schema.sql</code> (which creates the
+            scorecard photo bucket) has been run.
+          </p>
+        )}
         <div className="form-actions">
           <button type="button" onClick={sync.syncNow} disabled={sync.status === 'syncing'}>
             Sync now
@@ -67,7 +73,8 @@ export default function Account({ sync }: Props) {
     <section className="round-form" aria-label="Cloud sync">
       <h2>☁️ Cloud sync</h2>
       <p className="round-meta">
-        Sign in and your rounds, practice, tournaments, goals and bag follow you across devices.
+        Sign in and your rounds, scorecard photos, practice, tournaments, goals and bag follow you
+        across devices.
         Your data stays available offline and syncs automatically when you're back online.
       </p>
       <form

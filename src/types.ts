@@ -36,6 +36,8 @@ export interface GolfRound {
   highlights?: string
   workOns?: string
   notes?: string
+  /** Scorecard photos, stored on the device (IndexedDB) and in cloud storage when syncing. */
+  photoIds?: string[]
   createdAt: number
   updatedAt?: number
 }

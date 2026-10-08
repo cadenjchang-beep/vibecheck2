@@ -66,8 +66,12 @@ export function saveSyncMeta(meta: SyncMeta): void {
   localStorage.setItem(META_KEY, JSON.stringify(meta))
 }
 
-export function exportData(data: JournalData): void {
-  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' })
+/** Scorecard photos embedded in a backup file, as JPEG data URLs keyed by photo id. */
+export type PhotoBackup = Record<string, string>
+
+export function exportData(data: JournalData, photos?: PhotoBackup): void {
+  const payload = photos && Object.keys(photos).length > 0 ? { ...data, photos } : data
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' })
   const url = URL.createObjectURL(blob)
   const a = document.createElement('a')
   a.href = url
@@ -76,14 +80,29 @@ export function exportData(data: JournalData): void {
   URL.revokeObjectURL(url)
 }
 
-export function parseImport(text: string): JournalData | null {
+export interface ParsedImport {
+  data: JournalData
+  photos: PhotoBackup
+}
+
+function backupPhotos(value: unknown): PhotoBackup {
+  if (!value || typeof value !== 'object') return {}
+  return Object.fromEntries(
+    Object.entries(value).filter(
+      ([, v]) => typeof v === 'string' && v.startsWith('data:image/'),
+    ),
+  ) as PhotoBackup
+}
+
+export function parseImport(text: string): ParsedImport | null {
   try {
     const parsed = JSON.parse(text)
     if (parsed && typeof parsed === 'object' && Array.isArray(parsed.rounds)) {
-      return { ...emptyData(), ...parsed, version: 2 }
+      const { photos, ...rest } = parsed
+      return { data: { ...emptyData(), ...rest, version: 2 }, photos: backupPhotos(photos) }
     }
     if (Array.isArray(parsed)) {
-      return { ...emptyData(), rounds: parsed.map(upgradeRound) }
+      return { data: { ...emptyData(), rounds: parsed.map(upgradeRound) }, photos: {} }
     }
   } catch {
     // invalid JSON

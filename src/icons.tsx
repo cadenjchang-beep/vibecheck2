@@ -122,6 +122,48 @@ export function DownloadIcon({ size = 20, className }: IconProps) {
   )
 }
 
+/** Camera — take a scorecard photo. */
+export function CameraIcon({ size = 20, className }: IconProps) {
+  return (
+    <svg {...base(size, className)}>
+      <path d="M4 8.5A1.5 1.5 0 0 1 5.5 7h2.2l1.6-2.2h5.4L16.3 7h2.2A1.5 1.5 0 0 1 20 8.5v9a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 17.5Z" />
+      <circle cx="12" cy="12.8" r="3.4" />
+    </svg>
+  )
+}
+
+/** Photo stack — upload several photos. */
+export function PhotosIcon({ size = 20, className }: IconProps) {
+  return (
+    <svg {...base(size, className)}>
+      <rect x="3.5" y="7" width="14" height="12" rx="1.8" />
+      <path d="M7 4h11.5a2 2 0 0 1 2 2v9.5" />
+      <path d="M3.8 16.5l4-3.8 3.4 3.1 2-1.8 4 3.6" />
+      <circle cx="13" cy="10.6" r="1.1" />
+    </svg>
+  )
+}
+
+/** Scorecard grid — the scorecard library. */
+export function ScorecardIcon({ size = 20, className }: IconProps) {
+  return (
+    <svg {...base(size, className)}>
+      <rect x="3.5" y="5" width="17" height="14" rx="2" />
+      <path d="M3.5 9.7h17M3.5 14.3h17M8.5 5v14M13 5v14" />
+    </svg>
+  )
+}
+
+/** Sparkle — automatic reading. */
+export function SparkleIcon({ size = 20, className }: IconProps) {
+  return (
+    <svg {...base(size, className)}>
+      <path d="M12 3.5l1.9 5.1 5.1 1.9-5.1 1.9L12 17.5l-1.9-5.1L5 10.5l5.1-1.9Z" />
+      <path d="M18.5 16v4M16.5 18h4" />
+    </svg>
+  )
+}
+
 /** Small golf hole + flag mark for the wordmark. */
 export function LogoMark({ size = 34, className }: IconProps) {
   return (

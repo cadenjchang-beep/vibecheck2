@@ -1,5 +1,6 @@
 import type { Session } from '@supabase/supabase-js'
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { referencedPhotoIds, setPhotoSyncUser, uploadPhotos } from './photoSync'
 import { loadSyncMeta, saveSyncMeta } from './storage'
 import { supabase } from './supabase'
 import { mergeData, pullJournal, pushJournal } from './sync'
@@ -11,6 +12,8 @@ export interface CloudSync {
   status: SyncStatus
   email: string | null
   error: string
+  /** Last scorecard photo upload problem, if any. */
+  photoError: string
   info: string
   signIn: (email: string, password: string) => Promise<void>
   signUp: (email: string, password: string) => Promise<void>
@@ -35,6 +38,7 @@ export function useCloudSync(
   const [status, setStatus] = useState<SyncStatus>(supabase ? 'signedOut' : 'disabled')
   const [error, setError] = useState('')
   const [info, setInfo] = useState('')
+  const [photoError, setPhotoError] = useState('')
 
   const dataRef = useRef(data)
   dataRef.current = data
@@ -45,6 +49,14 @@ export function useCloudSync(
   const pushTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const syncing = useRef(false)
 
+  // Photos are uploaded separately from the journal document, after it.
+  const syncPhotos = useCallback((userId: string, data: JournalData) => {
+    uploadPhotos(userId, referencedPhotoIds(data)).then(
+      () => setPhotoError(''),
+      (e) => setPhotoError(e instanceof Error ? e.message : 'Photo upload failed.'),
+    )
+  }, [])
+
   const doPush = useCallback(async () => {
     const s = sessionRef.current
     if (!supabase || !s) return
@@ -54,11 +66,12 @@ export function useCloudSync(
       saveSyncMeta({ lastSyncedAt: updatedAt, dirty: false })
       setStatus('synced')
       setError('')
+      syncPhotos(s.user.id, dataRef.current)
     } catch (e) {
       setStatus('error')
       setError(e instanceof Error ? e.message : 'Could not reach the sync server.')
     }
-  }, [])
+  }, [syncPhotos])
 
   const fullSync = useCallback(async () => {
     const s = sessionRef.current
@@ -78,6 +91,7 @@ export function useCloudSync(
         adoptData(remote.data)
         saveSyncMeta({ lastSyncedAt: remote.updatedAt, dirty: false })
         setStatus('synced')
+        syncPhotos(s.user.id, remote.data)
       } else if (remote.updatedAt === meta.lastSyncedAt) {
         // Cloud unchanged since our last sync — safe to overwrite with local.
         await doPush()
@@ -95,7 +109,7 @@ export function useCloudSync(
     } finally {
       syncing.current = false
     }
-  }, [adoptData, doPush])
+  }, [adoptData, doPush, syncPhotos])
 
   // Track auth state.
   useEffect(() => {
@@ -110,6 +124,7 @@ export function useCloudSync(
   // Initial sync whenever a session appears.
   const userId = session?.user.id ?? null
   useEffect(() => {
+    setPhotoSyncUser(userId)
     if (userId) {
       void fullSync()
     } else if (supabase) {
@@ -170,6 +185,7 @@ export function useCloudSync(
     status,
     email: session?.user.email ?? null,
     error,
+    photoError,
     info,
     signIn,
     signUp,

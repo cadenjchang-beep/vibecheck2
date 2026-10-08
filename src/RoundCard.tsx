@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Lightbox, PhotoImage } from './Photo'
 import type { GolfRound, Tournament } from './types'
 import { ROUND_TYPE_LABELS, formatToPar, holeBreakdown, toPar } from './types'
 
@@ -28,7 +29,7 @@ function scoreMark(strokes: number, par: number): string {
   return 'double'
 }
 
-function MiniScorecard({ round }: { round: GolfRound }) {
+export function MiniScorecard({ round }: { round: GolfRound }) {
   const holes = round.holesData!
   const nines = round.holes === 18 ? [holes.slice(0, 9), holes.slice(9)] : [holes]
   return (
@@ -84,6 +85,8 @@ function MiniScorecard({ round }: { round: GolfRound }) {
 export default function RoundCard({ round, tournament, onEdit, onDelete }: Props) {
   const [expanded, setExpanded] = useState(false)
   const [confirmDelete, setConfirmDelete] = useState(false)
+  const [viewer, setViewer] = useState<number | null>(null)
+  const photoIds = round.photoIds ?? []
   const diff = toPar(round)
   const hasJournal = round.highlights || round.workOns || round.notes
   const hasStats =
@@ -101,6 +104,11 @@ export default function RoundCard({ round, tournament, onEdit, onDelete }: Props
         onClick={() => setExpanded((e) => !e)}
         aria-expanded={expanded}
       >
+        {photoIds.length > 0 && (
+          <span className="round-thumb">
+            <PhotoImage id={photoIds[0]} alt="" />
+          </span>
+        )}
         <div className="round-card-main">
           <span className="round-course">
             {round.roundType !== 'casual' && (
@@ -126,6 +134,21 @@ export default function RoundCard({ round, tournament, onEdit, onDelete }: Props
 
       {expanded && (
         <div className="round-card-body">
+          {photoIds.length > 0 && (
+            <div className="round-photos">
+              {photoIds.map((id, i) => (
+                <button
+                  key={id}
+                  type="button"
+                  className="round-photo"
+                  onClick={() => setViewer(i)}
+                  aria-label={`View scorecard photo ${i + 1}`}
+                >
+                  <PhotoImage id={id} alt={`Scorecard from ${round.course}`} />
+                </button>
+              ))}
+            </div>
+          )}
           {round.holesData && <MiniScorecard round={round} />}
           {breakdown && (
             <ul className="round-stats breakdown">
@@ -191,6 +214,16 @@ export default function RoundCard({ round, tournament, onEdit, onDelete }: Props
             )}
           </div>
         </div>
+      )}
+      {viewer !== null && (
+        <Lightbox
+          photoIds={photoIds}
+          startIndex={viewer}
+          title={`${round.course} · ${formatDate(round.date)}`}
+          onClose={() => setViewer(null)}
+        >
+          {round.holesData && <MiniScorecard round={round} />}
+        </Lightbox>
       )}
     </article>
   )
