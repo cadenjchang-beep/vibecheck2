@@ -1,0 +1,125 @@
+import { betterAuth } from 'better-auth';
+import { drizzleAdapter } from 'better-auth/adapters/drizzle';
+import { APP_NAME } from '@shared/constants';
+import { db } from './db/client';
+import { accounts, sessions, users, verifications } from './db/schema';
+import { env } from './env';
+import { newId } from './ids';
+import { log } from './log';
+import { resetPasswordEmail, verificationEmail } from './services/email/templates';
+import { sendEmail } from './services/email/transport';
+import { consumeRateLimit } from './services/rate-limit';
+import { beforeAccountDeletion } from './services/account';
+
+const DAY = 60 * 60 * 24;
+
+/** App-owned columns on `users`. None can be set through the auth endpoints. */
+const serverOnly = { input: false } as const;
+
+export const auth = betterAuth({
+  appName: APP_NAME,
+  baseURL: env.appUrl,
+  basePath: '/api/auth',
+  secret: env.authSecret,
+  trustedOrigins: [env.appUrl],
+  telemetry: { enabled: false },
+
+  database: drizzleAdapter(db, {
+    provider: 'pg',
+    usePlural: true,
+    schema: { users, sessions, accounts, verifications },
+  }),
+
+  emailAndPassword: {
+    enabled: true,
+    minPasswordLength: 8,
+    maxPasswordLength: 128,
+    autoSignIn: true,
+    // People can start studying straight away; publishing and classes ask for
+    // a verified address (see requireVerified in http/context.ts).
+    requireEmailVerification: false,
+    revokeSessionsOnPasswordReset: true,
+    resetPasswordTokenExpiresIn: 60 * 60,
+    sendResetPassword: async ({ user, url }) => {
+      await sendEmail(resetPasswordEmail(user, url));
+    },
+  },
+
+  emailVerification: {
+    sendOnSignUp: true,
+    autoSignInAfterVerification: true,
+    expiresIn: DAY,
+    sendVerificationEmail: async ({ user, url }) => {
+      await sendEmail(verificationEmail(user, url));
+    },
+  },
+
+  socialProviders: env.googleEnabled
+    ? { google: { clientId: env.GOOGLE_CLIENT_ID!, clientSecret: env.GOOGLE_CLIENT_SECRET! } }
+    : {},
+
+  account: {
+    // Google verifies addresses, so a Google sign-in may join an existing
+    // account that uses the same email.
+    accountLinking: { enabled: true, trustedProviders: ['google'] },
+  },
+
+  user: {
+    additionalFields: {
+      role: { type: 'string', defaultValue: 'student', ...serverOnly },
+      plan: { type: 'string', defaultValue: 'free', ...serverOnly },
+      planExpiresAt: { type: 'date', required: false, ...serverOnly },
+      birthYear: { type: 'number', required: false, ...serverOnly },
+      birthMonth: { type: 'number', required: false, ...serverOnly },
+      consentStatus: { type: 'string', defaultValue: 'unknown', ...serverOnly },
+      onboardedAt: { type: 'date', required: false, ...serverOnly },
+      locale: { type: 'string', defaultValue: 'en', ...serverOnly },
+      timezone: { type: 'string', defaultValue: 'UTC', ...serverOnly },
+      dailyGoal: { type: 'number', defaultValue: 20, ...serverOnly },
+      reminderChannel: { type: 'string', defaultValue: 'off', ...serverOnly },
+      reminderHour: { type: 'number', defaultValue: 18, ...serverOnly },
+    },
+    deleteUser: {
+      enabled: true,
+      beforeDelete: async (user) => {
+        await beforeAccountDeletion(user.id);
+      },
+    },
+  },
+
+  session: {
+    expiresIn: 30 * DAY,
+    updateAge: DAY,
+    freshAge: 10 * 60,
+  },
+
+  rateLimit: {
+    enabled: !env.isTest,
+    window: 60,
+    max: 120,
+    customRules: {
+      '/sign-in/email': { window: 60, max: 8 },
+      '/sign-up/email': { window: 60 * 10, max: 10 },
+      '/request-password-reset': { window: 60 * 10, max: 5 },
+      '/send-verification-email': { window: 60 * 10, max: 5 },
+    },
+    customStorage: {
+      consume: (key, rule) => consumeRateLimit(`auth:${key}`, rule),
+    },
+  },
+
+  advanced: {
+    cookiePrefix: 'tessera',
+    useSecureCookies: env.appUrl.startsWith('https://'),
+    database: { generateId: () => newId() },
+    ipAddress: env.TRUST_PROXY ? { ipAddressHeaders: ['x-forwarded-for'] } : { ipAddressHeaders: [] },
+  },
+
+  logger: {
+    disabled: env.isTest,
+    level: 'warn',
+    log: (level, message, ...args) => log[level]({ source: 'auth', args: args.length ? args : undefined }, message),
+  },
+});
+
+export type AuthSession = typeof auth.$Infer.Session;

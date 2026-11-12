@@ -1,0 +1,142 @@
+/** Shapes that cross the HTTP boundary. Imported by both the server and the client. */
+import type { ConsentStatus, Plan, ReminderChannel, Role, Stage, StudyMode, Subject, Visibility } from './constants';
+import type { Entitlements } from './entitlements';
+
+export interface ApiErrorBody {
+  error: { code: string; message: string; details?: unknown };
+}
+
+export interface MeUser {
+  id: string;
+  name: string;
+  email: string;
+  emailVerified: boolean;
+  image: string | null;
+  role: Role;
+  plan: Plan;
+  consentStatus: ConsentStatus;
+  onboarded: boolean;
+  /** Under 13: cannot publish publicly and is hidden from shared leaderboards. */
+  isChild: boolean;
+  locale: string;
+  timezone: string;
+  dailyGoal: number;
+  reminderChannel: ReminderChannel;
+  reminderHour: number;
+  hasPassword: boolean;
+  createdAt: string;
+}
+
+export interface Features {
+  googleAuth: boolean;
+  ai: boolean;
+  /** True when AI answers come from the built-in mock rather than a model. */
+  aiMock: boolean;
+  payments: 'stripe' | 'mock' | 'off';
+  push: boolean;
+  vapidPublicKey: string | null;
+}
+
+export interface MeResponse {
+  user: MeUser | null;
+  entitlements: Entitlements;
+  features: Features;
+}
+
+export interface MediaRef {
+  id: string;
+  url: string;
+}
+
+export interface CardDto {
+  id: string;
+  position: number;
+  /** Sanitised inline markup. Render with <RichText>, never as raw HTML. */
+  term: string;
+  termPlain: string;
+  definition: string;
+  definitionPlain: string;
+  termImage: MediaRef | null;
+  definitionImage: MediaRef | null;
+  termAudio: MediaRef | null;
+  definitionAudio: MediaRef | null;
+  aiGenerated: boolean;
+}
+
+export interface OwnerDto {
+  id: string;
+  name: string;
+  image: string | null;
+}
+
+export interface SetSummary {
+  id: string;
+  title: string;
+  description: string;
+  subject: Subject;
+  termLang: string;
+  definitionLang: string;
+  visibility: Visibility;
+  cardCount: number;
+  owner: OwnerDto;
+  isOwner: boolean;
+  starred: boolean;
+  updatedAt: string;
+  createdAt: string;
+  /** 0-100 for the viewer, or null when they have not studied it. */
+  mastery: number | null;
+  dueCount: number;
+  lastStudiedAt: string | null;
+}
+
+export interface CardProgressDto {
+  cardId: string;
+  stage: Stage;
+  easeFactor: number;
+  intervalDays: number;
+  repetitions: number;
+  lapses: number;
+  dueAt: string | null;
+  lastReviewedAt: string | null;
+  correctCount: number;
+  incorrectCount: number;
+  streak: number;
+  starred: boolean;
+}
+
+export interface SetDetail extends SetSummary {
+  cards: CardDto[];
+  /** The viewer's progress, keyed by card id. Empty for signed-out visitors. */
+  progress: Record<string, CardProgressDto>;
+  folderIds: string[];
+  canEdit: boolean;
+  /** Present when the viewer reaches this set through a class assignment. */
+  viaClass: { id: string; name: string } | null;
+  sourceSet: { id: string; title: string } | null;
+}
+
+export interface Page<T> {
+  items: T[];
+  nextCursor: string | null;
+}
+
+export interface FolderDto {
+  id: string;
+  name: string;
+  description: string;
+  setCount: number;
+  updatedAt: string;
+}
+
+export interface StudySessionDto {
+  id: string;
+  setId: string | null;
+  setTitle: string | null;
+  mode: StudyMode;
+  startedAt: string;
+  durationSeconds: number;
+  cardsStudied: number;
+  correctCount: number;
+  incorrectCount: number;
+  score: number | null;
+}
