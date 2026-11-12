@@ -8,8 +8,11 @@ import { env } from './env';
 import { HttpError } from './http/errors';
 import { originGuard, requestContext, sessionMiddleware, type AppEnv } from './http/context';
 import { reportError } from './log';
+import { mountSeoRoutes, renderPage } from './http/pages';
 import { mountClient } from './http/static';
 import { consentRoutes, meRoutes } from './routes/me';
+import { mediaRoutes } from './routes/media';
+import { cardRoutes, setRoutes } from './routes/sets';
 import { enforceRateLimit } from './services/rate-limit';
 import { clientIp, parseJson } from './http/context';
 import { log } from './log';
@@ -66,6 +69,9 @@ export function createApp() {
 
   app.route('/api/me', meRoutes);
   app.route('/api/consent', consentRoutes);
+  app.route('/api/sets', setRoutes);
+  app.route('/api/cards', cardRoutes);
+  app.route('/api/media', mediaRoutes);
 
   // Uncaught errors from the browser, so client-side failures show up in the logs too.
   app.post('/api/client-errors', async (c) => {
@@ -85,7 +91,8 @@ export function createApp() {
 
   app.all('/api/*', (c) => c.json<ApiErrorBody>({ error: { code: 'not_found', message: 'Not found.' } }, 404));
 
-  mountClient(app, async (_path, indexHtml) => indexHtml);
+  mountSeoRoutes(app);
+  mountClient(app, renderPage);
 
   app.onError((err, c) => {
     if (err instanceof HttpError) {

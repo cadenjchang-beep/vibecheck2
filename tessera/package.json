@@ -22,7 +22,9 @@
     "db:migrate": "tsx --env-file-if-exists=.env src/server/db/migrate.ts",
     "db:seed": "tsx --env-file-if-exists=.env src/server/db/seed.ts",
     "check:contrast": "node scripts/check-contrast.mjs",
-    "e2e:serve": "node scripts/e2e-server.mjs"
+    "e2e:serve": "node scripts/e2e-server.mjs",
+    "test:unit": "vitest run --project unit",
+    "test:api": "vitest run --project api"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^1.8.0",

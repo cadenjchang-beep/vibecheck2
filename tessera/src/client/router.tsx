@@ -34,13 +34,21 @@ export const router = createBrowserRouter([
       { path: 'welcome', lazy: page(() => import('./routes/welcome')) },
       { path: 'waiting', lazy: page(() => import('./routes/waiting')) },
       { path: 'consent/:token', lazy: page(() => import('./routes/consent')) },
+      { path: 'sets/:id/print', lazy: page(() => import('./routes/set-print')) },
       {
         element: <AppLayout />,
         children: [
           {
             element: <RequireAuth />,
-            children: [{ path: 'home', lazy: page(() => import('./routes/home')) }],
+            children: [
+              { path: 'home', lazy: page(() => import('./routes/home')) },
+              { path: 'library', lazy: page(() => import('./routes/library')) },
+              { path: 'sets/new', lazy: page(() => import('./routes/set-editor')) },
+              { path: 'sets/:id/edit', lazy: page(() => import('./routes/set-editor')) },
+            ],
           },
+          // Public and link-shared sets open without an account.
+          { path: 'sets/:id', lazy: page(() => import('./routes/set-detail')) },
           { path: '*', lazy: page(() => import('./routes/not-found')) },
         ],
       },

@@ -1,0 +1,11 @@
+{
+  "title": "Print or save as PDF",
+  "layout": "Layout",
+  "layoutTable": "Table",
+  "layoutCards": "Cards",
+  "layoutGlossary": "Glossary",
+  "button": "Print",
+  "hint": "To save a PDF, choose \"Save as PDF\" as the destination in the print dialog.",
+  "backToSet": "Back to set",
+  "footer": "{count, plural, one {# term} other {# terms}} · {url}"
+}

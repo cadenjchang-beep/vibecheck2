@@ -31,7 +31,37 @@ export default defineConfig({
   },
   test: {
     environment: 'node',
-    include: ['src/**/*.test.ts', 'tests/**/*.test.ts'],
-    env: { NODE_ENV: 'test' },
+    projects: [
+      {
+        extends: true,
+        // Pure logic shared by client and server: no database, no network.
+        test: { name: 'unit', include: ['src/**/*.test.ts'] },
+      },
+      {
+        extends: true,
+        // The HTTP API against a real PostgreSQL database (see tests/global-setup.ts).
+        test: {
+          name: 'api',
+          include: ['tests/**/*.test.ts'],
+          globalSetup: ['./tests/global-setup.ts'],
+          env: {
+            NODE_ENV: 'test',
+            DATABASE_URL: process.env.TEST_DATABASE_URL ?? 'postgres://tessera:tessera@127.0.0.1:5432/tessera_vitest',
+            APP_URL: 'http://localhost:5173',
+            BETTER_AUTH_SECRET: 'test-secret-test-secret-test-secret-1',
+            EMAIL_TRANSPORT: 'file',
+            OUTBOX_DIR: '.data/test/outbox',
+            STORAGE_DRIVER: 'local',
+            STORAGE_LOCAL_DIR: '.data/test/uploads',
+            AI_PROVIDER: 'mock',
+            PAYMENTS_PROVIDER: 'mock',
+            RUN_SCHEDULER: '0',
+            CRON_SECRET: 'test-cron-secret',
+            ANTHROPIC_API_KEY: '',
+            STRIPE_SECRET_KEY: '',
+          },
+        },
+      },
+    ],
   },
 });

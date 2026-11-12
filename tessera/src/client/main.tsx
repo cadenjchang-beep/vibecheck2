@@ -12,11 +12,23 @@ import { Toaster } from 'sonner';
 import { ErrorBoundary } from './components/error-boundary';
 import { TooltipProvider } from './components/ui/controls';
 import { I18nProvider, useI18n } from './lib/i18n';
-import { queryClient } from './lib/query';
+import { keys, queryClient } from './lib/query';
 import { installGlobalErrorReporting } from './lib/report';
 import { router } from './router';
 
 installGlobalErrorReporting();
+
+// A public set page arrives with its data embedded, so it renders without
+// waiting for a second request.
+try {
+  const preload = document.getElementById('__preload')?.textContent;
+  if (preload) {
+    const data = JSON.parse(preload) as { set?: { id: string } };
+    if (data.set) queryClient.setQueryData(keys.set(data.set.id), data.set);
+  }
+} catch {
+  /* a malformed preload only costs the extra request */
+}
 
 function DirectionProvider({ children }: { children: ReactNode }) {
   const { dir } = useI18n();

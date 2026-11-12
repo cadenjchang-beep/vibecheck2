@@ -232,7 +232,6 @@
     font-family: var(--font-sans);
     -webkit-text-size-adjust: 100%;
     text-size-adjust: 100%;
-    scroll-behavior: smooth;
     /* Room for the fixed header when jumping to an anchor. */
     scroll-padding-top: 5rem;
   }
@@ -356,6 +355,29 @@
   @media (prefers-reduced-motion: reduce) {
     transform: none;
   }
+}
+
+/* Server-rendered set content, shown until the app takes over the page. */
+.prerender {
+  max-width: 48rem;
+  margin: 0 auto;
+  padding: 5.5rem 1rem 2rem;
+}
+.prerender h1 {
+  font-size: 1.875rem;
+  font-weight: 800;
+  margin-bottom: 0.5rem;
+}
+.prerender p {
+  color: var(--muted-foreground);
+  margin-bottom: 0.75rem;
+}
+.prerender dt {
+  font-weight: 600;
+  margin-top: 0.875rem;
+}
+.prerender dd {
+  color: var(--muted-foreground);
 }
 
 @media print {

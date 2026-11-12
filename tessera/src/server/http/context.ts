@@ -40,9 +40,29 @@ export type AppEnv = {
 };
 export type Ctx = Context<AppEnv>;
 
-type SessionUser = NonNullable<Awaited<ReturnType<typeof auth.api.getSession>>>['user'];
+/** The user columns a viewer is built from; satisfied by a session user and by a `users` row. */
+export interface ViewerSource {
+  id: string;
+  name: string;
+  email: string;
+  emailVerified: boolean;
+  image?: string | null;
+  role: string;
+  plan: string;
+  planExpiresAt?: Date | null;
+  birthYear?: number | null;
+  birthMonth?: number | null;
+  consentStatus: string;
+  onboardedAt?: Date | null;
+  locale: string;
+  timezone: string;
+  dailyGoal: number;
+  reminderChannel: string;
+  reminderHour: number;
+  createdAt: Date;
+}
 
-export function toViewer(user: SessionUser): Viewer {
+export function toViewer(user: ViewerSource): Viewer {
   const plan = effectivePlan(user.plan, user.planExpiresAt);
   return {
     id: user.id,

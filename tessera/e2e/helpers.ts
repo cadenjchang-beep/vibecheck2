@@ -90,3 +90,37 @@ export const DEMO = {
   teacher: { email: 'teacher@tessera.test', password: 'tessera-demo' },
   premium: { email: 'premium@tessera.test', password: 'tessera-demo' },
 };
+
+export interface CardSeed {
+  term: string;
+  definition: string;
+}
+
+export function makeCards(count: number, prefix = ''): CardSeed[] {
+  return Array.from({ length: count }, (_, i) => ({ term: `${prefix}term ${i + 1}`, definition: `${prefix}definition ${i + 1}` }));
+}
+
+/** Creates a set through the API as the signed-in user of `page`. Returns its id. */
+export async function createSet(
+  page: Page,
+  options: { title?: string; cards?: CardSeed[]; visibility?: 'private' | 'unlisted' | 'public'; subject?: string } = {},
+): Promise<string> {
+  const response = await page.request.post('/api/sets', {
+    data: {
+      title: options.title ?? 'Test set',
+      description: '',
+      subject: options.subject ?? 'science',
+      termLang: 'en',
+      definitionLang: 'en',
+      visibility: options.visibility ?? 'private',
+      cards: options.cards ?? makeCards(6),
+    },
+  });
+  expect(response.status(), await response.text()).toBe(201);
+  return ((await response.json()) as { id: string }).id;
+}
+
+/** Tab-separated rows, as a spreadsheet puts them on the clipboard. */
+export function spreadsheetRows(cards: CardSeed[]): string {
+  return cards.map((c) => `${c.term}\t${c.definition}`).join('\n');
+}

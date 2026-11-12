@@ -5,15 +5,27 @@ import { Readable } from 'node:stream';
 import { DeleteObjectCommand, GetObjectCommand, PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
 import { env } from '../../env';
 
+export interface ByteRange {
+  start: number;
+  /** Inclusive; omitted means "to the end". */
+  end?: number;
+}
+
 export interface StoredObject {
   body: ReadableStream<Uint8Array>;
-  size: number | undefined;
+  /** Bytes in `body` (the requested range, or the whole object). */
+  size: number;
+  /** Size of the whole object. */
+  total: number;
+  /** The range actually served, when one was asked for. */
+  range?: { start: number; end: number };
 }
 
 /** Where uploaded images and audio live. Swap drivers with STORAGE_DRIVER. */
 export interface StorageDriver {
   put(key: string, data: Uint8Array, contentType: string): Promise<void>;
-  get(key: string): Promise<StoredObject | null>;
+  /** Reads an object, optionally only a byte range (audio seeking needs this). */
+  get(key: string, range?: ByteRange): Promise<StoredObject | null>;
   delete(key: string): Promise<void>;
 }
 
@@ -38,11 +50,18 @@ class LocalStorage implements StorageDriver {
     await writeFile(file, data);
   }
 
-  async get(key: string): Promise<StoredObject | null> {
+  async get(key: string, range?: ByteRange): Promise<StoredObject | null> {
     const file = this.file(key);
     try {
       const info = await stat(file);
-      return { body: Readable.toWeb(createReadStream(file)) as ReadableStream<Uint8Array>, size: info.size };
+      const total = info.size;
+      if (range && total > 0) {
+        const start = Math.min(range.start, total - 1);
+        const end = Math.min(range.end ?? total - 1, total - 1);
+        const stream = createReadStream(file, { start, end });
+        return { body: Readable.toWeb(stream) as ReadableStream<Uint8Array>, size: end - start + 1, total, range: { start, end } };
+      }
+      return { body: Readable.toWeb(createReadStream(file)) as ReadableStream<Uint8Array>, size: total, total };
     } catch (err) {
       if ((err as NodeJS.ErrnoException).code === 'ENOENT') return null;
       throw err;
@@ -70,12 +89,26 @@ class S3Storage implements StorageDriver {
     );
   }
 
-  async get(key: string): Promise<StoredObject | null> {
+  async get(key: string, range?: ByteRange): Promise<StoredObject | null> {
     assertSafeKey(key);
     try {
-      const out = await this.client.send(new GetObjectCommand({ Bucket: this.bucket, Key: key }));
+      const out = await this.client.send(
+        new GetObjectCommand({
+          Bucket: this.bucket,
+          Key: key,
+          Range: range ? `bytes=${range.start}-${range.end ?? ''}` : undefined,
+        }),
+      );
       if (!out.Body) return null;
-      return { body: out.Body.transformToWebStream() as ReadableStream<Uint8Array>, size: out.ContentLength };
+      const size = out.ContentLength ?? 0;
+      // "bytes 0-99/1234": the part after the slash is the full object size.
+      const served = /^bytes (\d+)-(\d+)\/(\d+)$/.exec(out.ContentRange ?? '');
+      return {
+        body: out.Body.transformToWebStream() as ReadableStream<Uint8Array>,
+        size,
+        total: served ? Number(served[3]) : size,
+        range: served ? { start: Number(served[1]), end: Number(served[2]) } : undefined,
+      };
     } catch (err) {
       const name = (err as { name?: string }).name;
       if (name === 'NoSuchKey' || name === 'NotFound') return null;

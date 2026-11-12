@@ -1,0 +1,10 @@
+{
+  "new": "New",
+  "learning": "Learning",
+  "familiar": "Familiar",
+  "mastered": "Mastered",
+  "newHint": "Not studied yet",
+  "learningHint": "Seen, but not reliable yet",
+  "familiarHint": "Usually right",
+  "masteredHint": "Recalled from memory"
+}

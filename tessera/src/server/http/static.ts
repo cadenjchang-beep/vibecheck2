@@ -3,7 +3,7 @@ import path from 'node:path';
 import { serveStatic } from '@hono/node-server/serve-static';
 import type { Hono } from 'hono';
 import { log } from '../log';
-import type { AppEnv } from './context';
+import type { AppEnv, Ctx } from './context';
 
 const CLIENT_DIR = './dist/client';
 
@@ -18,7 +18,10 @@ export function readIndexHtml(): string | null {
  * (the HTML shell, service worker, manifest) is revalidated on each request so
  * a deploy reaches users immediately.
  */
-export function mountClient(app: Hono<AppEnv>, renderPage: (path: string, indexHtml: string) => Promise<string>): void {
+export function mountClient(
+  app: Hono<AppEnv>,
+  renderPage: (c: Ctx, indexHtml: string) => Promise<{ html: string; status: 200 | 404 }>,
+): void {
   const indexHtml = readIndexHtml();
   if (!indexHtml) {
     log.warn('dist/client not found: serving the API only (run `npm run build` to serve the web app)');
@@ -43,8 +46,9 @@ export function mountClient(app: Hono<AppEnv>, renderPage: (path: string, indexH
     if (c.req.path.startsWith('/assets/') || /\.[a-z0-9]{2,5}$/i.test(c.req.path)) {
       return c.text('Not found', 404);
     }
-    const html = await renderPage(c.req.path, indexHtml);
-    c.header('cache-control', 'no-cache');
-    return c.html(html);
+    const page = await renderPage(c, indexHtml);
+    // The shell can embed a viewer-specific answer, so it is never shared between users.
+    c.header('cache-control', 'private, no-cache');
+    return c.html(page.html, page.status);
   });
 }
