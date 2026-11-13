@@ -58,7 +58,7 @@ export function SkipLink() {
   return (
     <a
       href="#main"
-      className="sr-only z-[60] rounded-xl bg-primary px-4 py-2 font-semibold text-primary-foreground focus:not-sr-only focus:fixed focus:start-3 focus:top-3"
+      className="sr-only z-[60] rounded-xl bg-primary font-semibold text-primary-foreground focus:not-sr-only focus:fixed focus:start-3 focus:top-3 focus:px-4 focus:py-2"
     >
       {t('common.skipToContent')}
     </a>
@@ -361,10 +361,11 @@ function Header({ user }: { user: MeUser | null }) {
                   <Link to="/browse">{t('nav.browse')}</Link>
                 </Button>
               ) : null}
-              <Button variant="ghost" asChild>
+              {/* Tighter on phones, where longer translations would not fit beside the logo. */}
+              <Button variant="ghost" asChild className="px-2.5 text-sm sm:px-4 sm:text-[0.95rem]">
                 <Link to="/login">{t('nav.logIn')}</Link>
               </Button>
-              <Button asChild>
+              <Button asChild className="px-3 text-sm sm:px-4 sm:text-[0.95rem]">
                 <Link to="/signup">{t('nav.signUp')}</Link>
               </Button>
             </>

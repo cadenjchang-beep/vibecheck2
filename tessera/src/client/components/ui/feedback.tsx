@@ -122,7 +122,12 @@ export function Avatar({ name, image, className }: { name: string; image?: strin
         className,
       )}
     >
-      {image ? <img src={image} alt="" className="size-full object-cover" referrerPolicy="no-referrer" /> : letters}
+      {/* Initials are drawn by CSS: decorative, so not part of any control's visible label. */}
+      {image ? (
+        <img src={image} alt="" className="size-full object-cover" referrerPolicy="no-referrer" />
+      ) : (
+        <span data-initials={letters} className="before:content-[attr(data-initials)]" />
+      )}
     </span>
   );
 }

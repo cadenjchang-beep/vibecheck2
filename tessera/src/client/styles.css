@@ -348,12 +348,17 @@
   inset: 0;
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
+  /* The face turned away is also hidden from assistive technology and from
+     "visible text" checks, once it has rotated past the edge. */
+  transition: visibility 0s linear 0s;
+  [data-flipped='true'] > &[data-face='front'],
+  [data-flipped='false'] > &[data-face='back'] {
+    visibility: hidden;
+    transition-delay: 210ms;
+  }
   @media (prefers-reduced-motion: reduce) {
     backface-visibility: visible;
-    [data-flipped='true'] > &[data-face='front'],
-    [data-flipped='false'] > &[data-face='back'] {
-      visibility: hidden;
-    }
+    transition: none;
   }
 }
 @utility flip-face-back {
@@ -397,4 +402,11 @@
   .no-print {
     display: none !important;
   }
+}
+
+/* Visually hidden text keeps its static position, which in right-to-left
+   layouts is past the right edge and widens the page. Pin it inside. */
+.sr-only:not(:focus) {
+  left: 0;
+  margin: 0;
 }

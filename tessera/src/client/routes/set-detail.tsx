@@ -1,5 +1,7 @@
 import {
   Copy,
+  CloudDownload,
+  CloudOff,
   Download,
   EllipsisVertical,
   FolderPlus,
@@ -36,7 +38,8 @@ import { Menu, MenuContent, MenuItem, MenuSeparator, MenuTrigger } from '@/compo
 import { ApiError } from '@/lib/api';
 import { useI18n } from '@/lib/i18n';
 import { useAiAvailable, useWriteDistractors } from '@/lib/ai';
-import { isActive, useErrorMessage, useUser } from '@/lib/me';
+import { isActive, useEntitlements, useErrorMessage, useUser } from '@/lib/me';
+import { downloadSet, removeDownload, useIsDownloaded } from '@/lib/pwa';
 import { BUILT } from '@/lib/built';
 import { AVAILABLE_MODES } from '@/lib/modes';
 import { usePageTitle } from '@/lib/page';
@@ -105,6 +108,27 @@ function Header({ set }: { set: SetDetail }) {
 
   const deleteSet = () => remove.mutate(set, { onSuccess: () => navigate('/library', { replace: true }) });
 
+  const entitlements = useEntitlements();
+  const downloaded = useIsDownloaded(set.id);
+  const canStoreOffline = signedIn && typeof caches !== 'undefined';
+  const toggleOffline = async () => {
+    if (!entitlements.offlineDownloads) {
+      toast(t('sets.offlinePremium'), BUILT.upgrade ? { action: { label: t('nav.upgrade'), onClick: () => navigate('/upgrade') } } : undefined);
+      return;
+    }
+    try {
+      if (downloaded) {
+        await removeDownload(set);
+        toast.success(t('sets.downloadRemoved'));
+      } else {
+        await downloadSet(set);
+        toast.success(t('sets.downloaded'));
+      }
+    } catch {
+      toast.error(t('sets.downloadFailed'));
+    }
+  };
+
   const aiAvailable = useAiAvailable() && signedIn;
   const writeDistractors = useWriteDistractors(set.id);
   const improveOptions = () => {
@@ -146,6 +170,12 @@ function Header({ set }: { set: SetDetail }) {
               <Badge variant="outline">{t('sets.languagePair', { term: languageName(set.termLang), definition: languageName(set.definitionLang) })}</Badge>
             ) : null}
             {set.isOwner ? <VisibilityBadge visibility={set.visibility} /> : null}
+            {downloaded ? (
+              <Badge variant="success">
+                <CloudDownload aria-hidden="true" />
+                {t('sets.availableOffline')}
+              </Badge>
+            ) : null}
             <span>{t('sets.updated', { when: formatRelative(set.updatedAt) })}</span>
           </div>
           {set.sourceSet ? (
@@ -210,6 +240,12 @@ function Header({ set }: { set: SetDetail }) {
                 <MenuItem onSelect={improveOptions}>
                   <WandSparkles aria-hidden="true" />
                   {t('ai.distractorsAction')}
+                </MenuItem>
+              ) : null}
+              {canStoreOffline && set.cards.length > 0 ? (
+                <MenuItem onSelect={() => void toggleOffline()}>
+                  {downloaded ? <CloudOff aria-hidden="true" /> : <CloudDownload aria-hidden="true" />}
+                  {downloaded ? t('sets.removeOffline') : t('sets.downloadOffline')}
                 </MenuItem>
               ) : null}
               <MenuItem onSelect={exportCsv} disabled={set.cards.length === 0}>

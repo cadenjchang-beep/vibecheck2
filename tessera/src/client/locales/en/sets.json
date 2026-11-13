@@ -84,5 +84,12 @@
   "homeYours": "Your sets",
   "homeSeeAll": "See all",
   "homeEmptyTitle": "Make your first study set",
-  "homeEmptyBody": "Type a few terms, or paste a whole list from a spreadsheet. You can be studying in under a minute."
+  "homeEmptyBody": "Type a few terms, or paste a whole list from a spreadsheet. You can be studying in under a minute.",
+  "downloadOffline": "Download for offline",
+  "removeOffline": "Remove offline copy",
+  "downloaded": "Saved on this device. You can study it without a connection.",
+  "downloadRemoved": "Offline copy removed",
+  "downloadFailed": "Couldn't save the set for offline use. Check your connection and storage space.",
+  "offlinePremium": "Downloading sets for offline use is part of Premium. Sets you've opened recently still work offline.",
+  "availableOffline": "Available offline"
 }

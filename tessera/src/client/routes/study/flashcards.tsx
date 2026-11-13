@@ -454,7 +454,6 @@ function Flashcards({ set }: { set: SetDetail }) {
             ref={cardRef}
             role="button"
             tabIndex={0}
-            aria-label={t('flashcards.flip')}
             aria-describedby="flip-hint"
             onClick={() => {
               if (!swiped.current) flip();

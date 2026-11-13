@@ -35,7 +35,7 @@ test.describe('core flow', () => {
 
     await page.getByRole('link', { name: 'Flashcards' }).click();
     await expect(page.getByText('term 1', { exact: true })).toBeVisible();
-    await page.getByRole('button', { name: 'Flip card' }).click();
+    await page.locator('[aria-describedby="flip-hint"]').click();
     await expect(page.getByText('definition 1', { exact: true })).toBeVisible();
     await expectNoHorizontalOverflow(page);
 
@@ -52,7 +52,7 @@ test.describe('core flow', () => {
 
     // Flashcards: sort three cards.
     await page.getByRole('link', { name: 'Flashcards' }).click();
-    await page.getByRole('button', { name: 'Flip card' }).click();
+    await page.locator('[aria-describedby="flip-hint"]').click();
     await page.getByRole('button', { name: 'Know it' }).click();
     await page.getByRole('button', { name: 'Know it' }).click();
     await page.getByRole('button', { name: 'Still learning' }).click();

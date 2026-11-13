@@ -215,10 +215,10 @@ function Listen({ set }: { set: SetDetail }) {
               <button
                 type="button"
                 aria-current={i === index}
-                aria-label={t('listen.playCard', { number: i + 1, term: c.termPlain })}
                 onClick={() => jump(i, true)}
                 className={cn('flex w-full items-baseline gap-3 rounded-xl px-3 py-2 text-start transition-colors hover:bg-accent', i === index && 'bg-primary-soft text-primary-soft-foreground')}
               >
+                <span className="sr-only">{t('listen.playFrom')}</span>
                 <span className="w-6 shrink-0 text-sm tabular-nums opacity-70">{i + 1}</span>
                 <span dir="auto" className="min-w-0 flex-1 truncate font-semibold">
                   {c.termPlain}

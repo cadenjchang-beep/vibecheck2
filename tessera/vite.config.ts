@@ -1,7 +1,42 @@
+import { createHash } from 'node:crypto';
+import { readdirSync, readFileSync, statSync } from 'node:fs';
 import path from 'node:path';
 import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
+import type { Plugin } from 'vite';
 import { defineConfig } from 'vitest/config';
+
+/** Files under public/, as site paths. */
+function publicFiles(dir = 'public', base = ''): string[] {
+  return readdirSync(dir).flatMap((name) => {
+    const full = path.join(dir, name);
+    return statSync(full).isDirectory() ? publicFiles(full, `${base}/${name}`) : [`${base}/${name}`];
+  });
+}
+
+/**
+ * Emits sw.js with the list of files to precache and a version that changes
+ * whenever any of them does, so browsers pick up each deploy.
+ */
+function serviceWorker(): Plugin {
+  return {
+    name: 'tessera-service-worker',
+    apply: 'build',
+    generateBundle(_options, bundle) {
+      const built = Object.keys(bundle)
+        .filter((file) => /\.(js|css)$/.test(file))
+        .map((file) => `/${file}`);
+      const statics = publicFiles().filter((file) => !/og-image|apple-touch/.test(file));
+      const hash = createHash('sha256');
+      for (const file of built.sort()) hash.update(file);
+      for (const file of statics.sort()) hash.update(file).update(readFileSync(path.join('public', file)));
+      const source = readFileSync('src/client/sw.js', 'utf8')
+        .replace("'__BUILD_VERSION__'", JSON.stringify(hash.digest('hex').slice(0, 12)))
+        .replace("'__PRECACHE_MANIFEST__'", JSON.stringify([...statics, ...built]));
+      this.emitFile({ type: 'asset', fileName: 'sw.js', source });
+    },
+  };
+}
 
 const API = process.env.API_URL ?? 'http://localhost:8787';
 
@@ -10,7 +45,7 @@ export default defineConfig({
   // from /api/me. Keeping Vite away from .env also stops a server-side
   // NODE_ENV=development from producing a development build of React.
   envDir: false,
-  plugins: [react(), tailwindcss()],
+  plugins: [react(), tailwindcss(), serviceWorker()],
   resolve: {
     alias: {
       '@': path.resolve(import.meta.dirname, 'src/client'),

@@ -41,6 +41,12 @@ export function mountClient(
     }),
   );
 
+  // The bare shell, which the service worker keeps for opening the app offline.
+  app.get('/shell', (c) => {
+    c.header('cache-control', 'no-cache');
+    return c.html(indexHtml);
+  });
+
   // Anything else is a client-side route: answer with the app shell.
   app.get('*', async (c) => {
     if (c.req.path.startsWith('/assets/') || /\.[a-z0-9]{2,5}$/i.test(c.req.path)) {

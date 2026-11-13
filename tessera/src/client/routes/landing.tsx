@@ -33,7 +33,6 @@ function SampleCard() {
       <button
         type="button"
         onClick={() => setFlipped((f) => !f)}
-        aria-label={flipped ? t('landing.sampleDefinition') : t('landing.sampleTerm')}
         data-flipped={flipped}
         className="flip-card block aspect-[5/3] w-full rounded-3xl text-center"
       >
@@ -78,10 +77,11 @@ export default function Landing() {
               <Link to="/browse">{t('nav.browse')}</Link>
             </Button>
           ) : null}
-          <Button variant="ghost" asChild>
+          {/* Tighter on phones, where longer translations would not fit beside the logo. */}
+          <Button variant="ghost" asChild className="px-2.5 text-sm sm:px-4 sm:text-[0.95rem]">
             <Link to="/login">{t('nav.logIn')}</Link>
           </Button>
-          <Button asChild>
+          <Button asChild className="px-3 text-sm sm:px-4 sm:text-[0.95rem]">
             <Link to="/signup">{t('nav.signUp')}</Link>
           </Button>
         </div>

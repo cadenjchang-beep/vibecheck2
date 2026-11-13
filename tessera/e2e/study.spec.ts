@@ -149,7 +149,7 @@ test.describe('Flashcards', () => {
     await signUp(page, newUser('swipe'));
     const id = await createSet(page, { cards: VOCAB.slice(0, 3) });
     await page.goto(`/sets/${id}/flashcards`);
-    const card = page.getByRole('button', { name: 'Flip card' });
+    const card = page.locator('[aria-describedby="flip-hint"]');
     const box = (await card.boundingBox())!;
     const swipe = async (dx: number) => {
       const x = box.x + box.width / 2;

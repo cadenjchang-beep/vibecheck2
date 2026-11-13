@@ -1,7 +1,8 @@
 import { useEffect, type ComponentType } from 'react';
 import { createBrowserRouter, Outlet } from 'react-router';
 import { AppLayout, RouteAnnouncer, syncTimezone } from './components/app-layout';
-import { isActive, useUser } from './lib/me';
+import { isActive, useMe, useUser } from './lib/me';
+import { syncCacheOwner, useUpdateNotice } from './lib/pwa';
 import { setOutboxUser } from './lib/outbox';
 import { RouteError } from './components/error-boundary';
 import { GuestOnly, RequireAuth } from './components/guards';
@@ -19,6 +20,13 @@ function Root() {
     if (isActive(user)) syncTimezone(user);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userId]);
+  // Only once the session is known: a pending request is not a sign-out.
+  const me = useMe();
+  const settled = me.isSuccess;
+  useEffect(() => {
+    if (settled) syncCacheOwner(userId);
+  }, [settled, userId]);
+  useUpdateNotice();
   return (
     <>
       <RouteAnnouncer />

@@ -14,6 +14,7 @@ import { TooltipProvider } from './components/ui/controls';
 import { I18nProvider, useI18n } from './lib/i18n';
 import { keys, queryClient } from './lib/query';
 import { installOutboxTriggers } from './lib/outbox';
+import { registerServiceWorker } from './lib/pwa';
 import { installGlobalErrorReporting } from './lib/report';
 import { installSyncReconciler } from './lib/study';
 import { router } from './router';
@@ -21,6 +22,7 @@ import { router } from './router';
 installGlobalErrorReporting();
 installOutboxTriggers();
 installSyncReconciler(queryClient);
+registerServiceWorker();
 
 // A public set page arrives with its data embedded, so it renders without
 // waiting for a second request.

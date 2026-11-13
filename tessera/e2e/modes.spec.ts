@@ -265,7 +265,7 @@ test.describe('Listen', () => {
     expect(spoken).toEqual(['en:hola', 'en:hello', 'en:adiós', 'en:goodbye', 'en:gracias', 'en:thank you']);
 
     // Jump to a card from the list, then pause.
-    await page.getByRole('button', { name: 'Play from card 2: adiós' }).click();
+    await page.getByRole('button', { name: /^Play from card 2 adiós/ }).click();
     await expect(page.getByRole('button', { name: 'Pause' })).toBeVisible();
     await page.getByRole('button', { name: 'Pause' }).click();
     await expect(page.getByRole('button', { name: 'Play', exact: true })).toBeVisible();

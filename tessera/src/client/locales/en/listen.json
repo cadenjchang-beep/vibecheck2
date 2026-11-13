@@ -12,6 +12,6 @@
   "noVoice": "Your device has no voice for {language}, so it may sound wrong or stay silent.",
   "nowPlaying": "Now playing: card {current} of {total}",
   "upNext": "All cards",
-  "playCard": "Play from card {number}: {term}",
-  "finished": "That was the last card."
+  "finished": "That was the last card.",
+  "playFrom": "Play from card"
 }
