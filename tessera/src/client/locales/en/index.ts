@@ -3,6 +3,8 @@ import common from './common.json';
 import editor from './editor.json';
 import errors from './errors.json';
 import flashcards from './flashcards.json';
+import folders from './folders.json';
+import home from './home.json';
 import landing from './landing.json';
 import learn from './learn.json';
 import legal from './legal.json';
@@ -12,12 +14,15 @@ import nav from './nav.json';
 import onboarding from './onboarding.json';
 import print from './print.json';
 import review from './review.json';
+import search from './search.json';
 import sets from './sets.json';
+import settings from './settings.json';
 import stages from './stages.json';
+import stats from './stats.json';
 import study from './study.json';
 import subjects from './subjects.json';
 import test from './test.json';
 
 /** English is the source catalogue: every key must exist here. */
-const en = { common, nav, auth, onboarding, errors, landing, sets, editor, subjects, stages, print, study, flashcards, learn, test, match, review, listen, legal };
+const en = { common, nav, auth, onboarding, errors, landing, sets, editor, subjects, stages, print, study, flashcards, learn, test, match, review, listen, legal, home, folders, search, stats, settings };
 export default en;

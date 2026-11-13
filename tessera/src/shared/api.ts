@@ -169,3 +169,49 @@ export interface MatchScoresResponse {
   /** Fastest time per player among everyone who can see the set. `name` is null for hidden names. */
   leaders: Array<{ name: string | null; timeMs: number; isYou: boolean }>;
 }
+
+export interface DayActivity {
+  /** Local calendar day, YYYY-MM-DD. */
+  day: string;
+  cards: number;
+  seconds: number;
+}
+
+export interface StatsOverview {
+  streak: { current: number; longest: number };
+  today: { cards: number; seconds: number; goal: number; goalMet: boolean };
+  /** The last seven local days, oldest first, ending today. */
+  week: DayActivity[];
+  totals: { cards: number; seconds: number; daysActive: number; mastered: number; setsStudied: number };
+}
+
+export interface StatsDetailed {
+  /** The last twelve weeks of days, oldest first. */
+  days: DayActivity[];
+  byMode: Array<{ mode: StudyMode; sessions: number; seconds: number; correct: number; incorrect: number }>;
+  hardest: Array<{ cardId: string; setId: string; setTitle: string; term: string; definition: string; correct: number; incorrect: number }>;
+  /** Reviews coming due on each of the next fourteen days; overdue cards count as today. */
+  forecast: Array<{ day: string; due: number }>;
+}
+
+export interface CardHistory {
+  progress: CardProgressDto | null;
+  events: Array<{ at: string; mode: StudyMode; kind: string; correct: boolean | null; rating: number | null; stageAfter: Stage }>;
+}
+
+export interface DashboardResponse {
+  overview: StatsOverview;
+  review: ReviewSummary;
+  recent: SetSummary[];
+  starred: SetSummary[];
+}
+
+export interface FolderDetail {
+  folder: FolderDto;
+  sets: SetSummary[];
+}
+
+export interface SubjectCount {
+  subject: Subject;
+  count: number;
+}

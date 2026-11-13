@@ -19,6 +19,8 @@ import type { CardDto, SetDetail } from '@shared/api';
 import { LANGUAGES, type Stage } from '@shared/constants';
 import { toCsv } from '@shared/csv';
 import { countStages, masteryPercent, STAGE_ORDER } from '@shared/progress';
+import { CardHistoryDialog } from '@/components/card-history';
+import { FolderPicker } from '@/components/folder-picker';
 import { Mosaic, StageTile } from '@/components/mosaic';
 import { RichText } from '@/components/rich-text';
 import { VisibilityBadge } from '@/components/set-card';
@@ -75,6 +77,7 @@ function Header({ set }: { set: SetDetail }) {
   const navigate = useNavigate();
   const errorMessage = useErrorMessage();
   const [shareOpen, setShareOpen] = useState(false);
+  const [foldersOpen, setFoldersOpen] = useState(false);
   const star = useStarSet();
   const remove = useDeleteSet();
   const duplicate = useDuplicateSet();
@@ -181,11 +184,9 @@ function Header({ set }: { set: SetDetail }) {
                     {t('sets.duplicate')}
                   </MenuItem>
                   {BUILT.folders ? (
-                    <MenuItem asChild>
-                      <Link to={`/folders?add=${set.id}`}>
-                        <FolderPlus aria-hidden="true" />
-                        {t('sets.addToFolder')}
-                      </Link>
+                    <MenuItem onSelect={() => setFoldersOpen(true)}>
+                      <FolderPlus aria-hidden="true" />
+                      {t('sets.addToFolder')}
                     </MenuItem>
                   ) : null}
                 </>
@@ -214,6 +215,7 @@ function Header({ set }: { set: SetDetail }) {
         </div>
       </div>
       <ShareDialog set={set} open={shareOpen} onOpenChange={setShareOpen} />
+      {signedIn ? <FolderPicker set={set} open={foldersOpen} onOpenChange={setFoldersOpen} /> : null}
     </header>
   );
 }
@@ -310,9 +312,10 @@ interface TermRowProps {
   definitionLang: string;
   showStage: boolean;
   onStar?: (cardId: string, starred: boolean) => void;
+  onHistory?: (card: CardDto) => void;
 }
 
-const TermRow = memo(function TermRow({ card, stage, starred, termLang, definitionLang, showStage, onStar }: TermRowProps) {
+const TermRow = memo(function TermRow({ card, stage, starred, termLang, definitionLang, showStage, onStar, onHistory }: TermRowProps) {
   const { t } = useI18n();
   const starLabel = starred ? t('sets.unstarCard', { term: card.termPlain }) : t('sets.starCard', { term: card.termPlain });
   const play = () => {
@@ -323,10 +326,14 @@ const TermRow = memo(function TermRow({ card, stage, starred, termLang, definiti
     <li className="flex gap-2 rounded-2xl border border-border bg-card p-3 shadow-card [contain-intrinsic-size:auto_5rem] [content-visibility:auto] sm:p-4">
       {showStage ? (
         <Tooltip label={t(`stages.${stage}`)}>
-          <span tabIndex={0} className="mt-1.5 shrink-0 rounded-[22%]">
+          <button
+            type="button"
+            onClick={() => onHistory?.(card)}
+            aria-label={`${t(`stages.${stage}`)}. ${t('stats.historyOpen', { term: card.termPlain })}`}
+            className="-m-2 mt-[-0.125rem] flex size-8 shrink-0 items-center justify-center rounded-lg hover:bg-accent"
+          >
             <StageTile stage={stage} className="size-4" />
-            <span className="sr-only">{t(`stages.${stage}`)}</span>
-          </span>
+          </button>
         </Tooltip>
       ) : null}
       <div className="grid min-w-0 flex-1 gap-x-6 gap-y-1.5 md:grid-cols-[2fr_3fr]">
@@ -374,6 +381,7 @@ function Terms({ set }: { set: SetDetail }) {
   const [filter, setFilter] = useState<TermFilter>('all');
   const [sort, setSort] = useState<TermSort>('original');
   const starCard = useStarCard(set.id);
+  const [historyCard, setHistoryCard] = useState<CardDto | null>(null);
   const onStar = useMemo(
     () => (signedIn ? (cardId: string, starred: boolean) => starCard.mutate({ cardId, starred }) : undefined),
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -449,10 +457,12 @@ function Terms({ set }: { set: SetDetail }) {
               definitionLang={set.definitionLang}
               showStage={signedIn}
               onStar={onStar}
+              onHistory={setHistoryCard}
             />
           ))}
         </ul>
       )}
+      <CardHistoryDialog card={historyCard} onClose={() => setHistoryCard(null)} />
     </section>
   );
 }

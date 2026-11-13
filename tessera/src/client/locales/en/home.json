@@ -1,0 +1,18 @@
+{
+  "streak": "{count, plural, one {#-day streak} other {#-day streak}}",
+  "streakNone": "No streak yet",
+  "streakHint": "Study any card today to start one.",
+  "streakKeep": "Study today to keep it going.",
+  "streakDone": "You've studied today.",
+  "longest": "Longest: {count, plural, one {# day} other {# days}}",
+  "goalTitle": "Today's goal",
+  "goalProgress": "{done} of {goal} cards",
+  "goalMet": "Goal reached. Nicely done!",
+  "goalOff": "No daily goal set",
+  "goalSet": "Set a goal",
+  "dueTitle": "Ready for review",
+  "dueBody": "{count, plural, one {# card is due} other {# cards are due}}",
+  "dueNone": "Nothing due right now",
+  "starred": "Starred sets",
+  "browse": "Find sets to study"
+}

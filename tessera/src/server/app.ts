@@ -10,6 +10,7 @@ import { originGuard, requestContext, sessionMiddleware, type AppEnv } from './h
 import { reportError } from './log';
 import { mountSeoRoutes, renderPage } from './http/pages';
 import { mountClient } from './http/static';
+import { folderRoutes, internalRoutes, pushRoutes, searchRoutes, setFolderRoutes, statsRoutes } from './routes/library';
 import { consentRoutes, meRoutes } from './routes/me';
 import { mediaRoutes } from './routes/media';
 import { reviewRoutes } from './routes/review';
@@ -76,6 +77,12 @@ export function createApp() {
   app.route('/api/media', mediaRoutes);
   app.route('/api/study', studyRoutes);
   app.route('/api/review', reviewRoutes);
+  app.route('/api/sets', setFolderRoutes);
+  app.route('/api/folders', folderRoutes);
+  app.route('/api/search', searchRoutes);
+  app.route('/api/stats', statsRoutes);
+  app.route('/api/push', pushRoutes);
+  app.route('/api/internal', internalRoutes);
 
   // Uncaught errors from the browser, so client-side failures show up in the logs too.
   app.post('/api/client-errors', async (c) => {

@@ -3,12 +3,15 @@ import { createApp } from './app';
 import { pool } from './db/client';
 import { env } from './env';
 import { log, reportError } from './log';
+import { startScheduler } from './services/reminders';
 
 const app = createApp();
 
 const server = serve({ fetch: app.fetch, port: env.PORT }, (info) => {
   log.info({ port: info.port, env: env.NODE_ENV, appUrl: env.appUrl }, 'tessera api listening');
 });
+
+if (env.RUN_SCHEDULER && !env.isTest) startScheduler();
 
 process.on('unhandledRejection', (reason) => reportError(reason, { where: 'unhandledRejection' }));
 process.on('uncaughtException', (err) => {

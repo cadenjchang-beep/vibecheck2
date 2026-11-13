@@ -1,0 +1,20 @@
+{
+  "title": "Search",
+  "placeholder": "Search by title, subject or term",
+  "resultsFor": "Results for \"{query}\"",
+  "allSubjects": "All subjects",
+  "subjectFilter": "Subject",
+  "scope": "Show",
+  "scopeAll": "Public sets and mine",
+  "scopeMine": "Only my sets",
+  "emptyTitle": "No sets found",
+  "emptyBody": "Try fewer or different words, or browse by subject.",
+  "startTitle": "Search every public set",
+  "startBody": "Look for a topic, a course, or a single term you need to learn.",
+  "browseTitle": "Browse by subject",
+  "browseBody": "Public sets shared by other learners and teachers.",
+  "subjectCount": "{count, plural, one {# set} other {# sets}}",
+  "subjectTitle": "{subject} sets",
+  "subjectEmpty": "No public sets in this subject yet. Be the first to share one.",
+  "allSubjectsLink": "All subjects"
+}

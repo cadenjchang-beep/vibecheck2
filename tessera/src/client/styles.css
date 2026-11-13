@@ -61,6 +61,9 @@
   --stage-familiar: oklch(0.55 0.15 250);
   --stage-mastered: oklch(0.52 0.13 155);
 
+  /* Data marks in charts: validated with the dataviz palette checker for each theme. */
+  --chart-1: oklch(0.55 0.17 345);
+
   --shadow-color: 310 18% 14%;
 }
 
@@ -114,6 +117,8 @@
   --stage-familiar: oklch(0.72 0.12 250);
   --stage-mastered: oklch(0.74 0.14 155);
 
+  --chart-1: oklch(0.66 0.17 345);
+
   --shadow-color: 310 30% 4%;
 }
 
@@ -156,6 +161,7 @@
   --color-info-soft: var(--info-soft);
   --color-info-soft-foreground: var(--info-soft-foreground);
   --color-gold: var(--gold);
+  --color-chart-1: var(--chart-1);
   --color-stage-new: var(--stage-new);
   --color-stage-learning: var(--stage-learning);
   --color-stage-familiar: var(--stage-familiar);
