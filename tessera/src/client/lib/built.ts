@@ -10,7 +10,7 @@ export const BUILT = {
   listen: true,
   search: true,
   folders: true,
-  classes: false,
+  classes: true,
   stats: true,
   settings: true,
   upgrade: false,

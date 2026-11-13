@@ -13,6 +13,7 @@ import { mountClient } from './http/static';
 import { folderRoutes, internalRoutes, pushRoutes, searchRoutes, setFolderRoutes, statsRoutes } from './routes/library';
 import { consentRoutes, meRoutes } from './routes/me';
 import { aiRoutes } from './routes/ai';
+import { classRoutes } from './routes/classes';
 import { mediaRoutes } from './routes/media';
 import { reviewRoutes } from './routes/review';
 import { cardRoutes, setRoutes } from './routes/sets';
@@ -84,6 +85,7 @@ export function createApp() {
   app.route('/api/stats', statsRoutes);
   app.route('/api/push', pushRoutes);
   app.route('/api/ai', aiRoutes);
+  app.route('/api/classes', classRoutes);
 app.route('/api/internal', internalRoutes);
 
   // Uncaught errors from the browser, so client-side failures show up in the logs too.
