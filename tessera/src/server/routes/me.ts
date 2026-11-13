@@ -13,6 +13,7 @@ import { parseJson, requireSession, type AppEnv, type Viewer } from '../http/con
 import { newId, newToken, sha256 } from '../ids';
 import { parentalConsentEmail } from '../services/email/templates';
 import { sendEmail } from '../services/email/transport';
+import { exportAccountData } from '../services/account';
 import { enforceRateLimit } from '../services/rate-limit';
 
 export const features: Features = {
@@ -106,6 +107,14 @@ async function sendConsentRequest(userId: string, childName: string, parentEmail
 }
 
 export const meRoutes = new Hono<AppEnv>()
+  .get('/export', async (c) => {
+    const viewer = requireSession(c);
+    await enforceRateLimit(`export:${viewer.id}`, { window: 3600, max: 10 });
+    const data = await exportAccountData(viewer);
+    c.header('content-disposition', `attachment; filename="tessera-export-${new Date().toISOString().slice(0, 10)}.json"`);
+    c.header('cache-control', 'no-store');
+    return c.json(data);
+  })
   .get('/', async (c) => {
     const viewer = c.get('viewer');
     const body: MeResponse = {

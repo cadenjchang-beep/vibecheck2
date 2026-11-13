@@ -3,7 +3,7 @@ import { createSet, expectNoHorizontalOverflow, newUser, signUp, VOCAB } from '.
 
 // Runs in the 375px "mobile" project (see playwright.config.ts) as well as on desktop.
 test('every page fits a 375px screen without sideways scrolling', async ({ page }) => {
-  for (const path of ['/', '/login', '/signup', '/forgot-password', '/browse', '/privacy', '/terms']) {
+  for (const path of ['/', '/login', '/signup', '/forgot-password', '/browse', '/privacy', '/terms', '/upgrade']) {
     await page.goto(path);
     await page.waitForLoadState('networkidle');
     await expectNoHorizontalOverflow(page);

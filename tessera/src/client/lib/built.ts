@@ -13,6 +13,6 @@ export const BUILT = {
   classes: true,
   stats: true,
   settings: true,
-  upgrade: false,
+  upgrade: true,
   ai: true,
 } as const;

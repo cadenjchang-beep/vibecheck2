@@ -10,6 +10,7 @@ import { useUser } from '@/lib/me';
 import { usePageTitle } from '@/lib/page';
 import { useLibrary } from '@/lib/sets';
 import { useDashboard } from '@/lib/stats';
+import { PromoSlot } from '@/components/promo';
 
 function Section({ title, sets, more }: { title: string; sets: SetSummary[]; more?: boolean }) {
   const { t } = useI18n();
@@ -156,6 +157,7 @@ export default function Home() {
           <Section title={t('sets.homeYours')} sets={mySets} more={Boolean(mine.data?.pages[0]?.nextCursor) || mySets.length >= 6} />
         </>
       )}
+      <PromoSlot className="mt-10" />
     </div>
   );
 }

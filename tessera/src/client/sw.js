@@ -17,6 +17,7 @@ const MEDIA_CACHE = 'tessera-media';
 const API_CACHE_LIMIT = 300;
 const MEDIA_CACHE_LIMIT = 400;
 const USER_CACHES = [API_CACHE, OFFLINE_CACHE, MEDIA_CACHE];
+const NEVER_CACHE = new Set(['/api/me/export', '/api/billing']);
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
@@ -45,22 +46,27 @@ async function trim(cacheName, limit) {
   await Promise.all(keys.slice(0, Math.max(0, keys.length - limit)).map((k) => cache.delete(k)));
 }
 
-async function networkFirstApi(request) {
+async function networkFirstApi(event) {
+  const { request } = event;
   try {
     const response = await fetch(request);
-    if (response.ok && (response.headers.get('content-type') || '').includes('application/json')) {
+    // Every API answer is marked no-store for browsers and proxies; this cache is
+    // the app's own and is cleared at sign-out. The data export is never kept.
+    const storable = !NEVER_CACHE.has(new URL(request.url).pathname);
+    if (response.ok && storable && (response.headers.get('content-type') || '').includes('application/json')) {
       const copy = response.clone();
       const pinned = response.clone();
-      caches
-        .open(API_CACHE)
-        .then((cache) => cache.put(request, copy))
-        .then(() => trim(API_CACHE, API_CACHE_LIMIT))
-        .catch(() => {});
-      // Keep a downloaded set's offline copy as fresh as what was last seen.
-      caches
-        .open(OFFLINE_CACHE)
-        .then(async (cache) => ((await cache.match(request)) ? cache.put(request, pinned) : undefined))
-        .catch(() => {});
+      // Kept alive with waitUntil so the copy is stored even if the page goes away.
+      event.waitUntil(
+        Promise.all([
+          caches
+            .open(API_CACHE)
+            .then((cache) => cache.put(request, copy))
+            .then(() => trim(API_CACHE, API_CACHE_LIMIT)),
+          // Keep a downloaded set's offline copy as fresh as what was last seen.
+          caches.open(OFFLINE_CACHE).then(async (cache) => ((await cache.match(request)) ? cache.put(request, pinned) : undefined)),
+        ]).catch(() => {}),
+      );
     }
     return response;
   } catch (error) {
@@ -132,7 +138,7 @@ self.addEventListener('fetch', (event) => {
       event.respondWith(cacheFirst(request, MEDIA_CACHE, MEDIA_CACHE_LIMIT));
       return;
     }
-    event.respondWith(networkFirstApi(request));
+    event.respondWith(networkFirstApi(event));
     return;
   }
   // Built files are content-hashed, so a cached copy never goes stale.

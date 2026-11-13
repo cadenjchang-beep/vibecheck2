@@ -24,7 +24,8 @@ import stats from './stats.json';
 import study from './study.json';
 import subjects from './subjects.json';
 import test from './test.json';
+import upgrade from './upgrade.json';
 
 /** English is the source catalogue: every key must exist here. */
-const en = { common, nav, auth, onboarding, errors, landing, sets, editor, subjects, stages, print, study, flashcards, learn, test, match, review, listen, legal, home, folders, search, stats, settings, ai, classes };
+const en = { common, nav, auth, onboarding, errors, landing, sets, editor, subjects, stages, print, study, flashcards, learn, test, match, review, listen, legal, home, folders, search, stats, settings, ai, classes, upgrade };
 export default en;

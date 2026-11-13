@@ -12,6 +12,9 @@ test('an opened set can be studied offline, and the answers sync when back onlin
   // Open the set once more under the worker, so its answer is cached.
   await page.reload();
   await expect(page.getByRole('heading', { name: 'Offline vocab' })).toBeVisible();
+  await expect
+    .poll(() => page.evaluate(async (setId) => Boolean(await caches.match(`/api/sets/${setId}`)), id), { timeout: 10_000 })
+    .toBe(true);
 
   await context.setOffline(true);
   await page.goto(`/sets/${id}/learn`);

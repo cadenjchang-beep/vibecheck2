@@ -30,7 +30,9 @@ try {
   const preload = document.getElementById('__preload')?.textContent;
   if (preload) {
     const data = JSON.parse(preload) as { set?: { id: string } };
-    if (data.set) queryClient.setQueryData(keys.set(data.set.id), data.set);
+    // Marked stale: it renders at once, and one background fetch then refreshes
+    // it through the service worker, which keeps a copy for offline use.
+    if (data.set) queryClient.setQueryData(keys.set(data.set.id), data.set, { updatedAt: 0 });
   }
 } catch {
   /* a malformed preload only costs the extra request */

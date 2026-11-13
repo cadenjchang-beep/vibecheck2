@@ -17,7 +17,7 @@ for (const scheme of ['light', 'dark'] as const) {
 
     test('public pages', async ({ page }) => {
       const problems: string[] = [];
-      for (const path of ['/', '/login', '/signup', '/browse', '/privacy']) {
+      for (const path of ['/', '/login', '/signup', '/browse', '/privacy', '/upgrade']) {
         await page.goto(path);
         await page.waitForLoadState('networkidle');
         problems.push(...(await audit(page, path)));

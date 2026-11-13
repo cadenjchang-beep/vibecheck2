@@ -215,3 +215,16 @@ export interface SubjectCount {
   subject: Subject;
   count: number;
 }
+
+export interface BillingStatus {
+  plan: Plan;
+  provider: 'stripe' | 'mock' | 'off';
+  price: { amount: number; currency: string; interval: string };
+  subscription: {
+    status: string;
+    currentPeriodEnd: string | null;
+    cancelAtPeriodEnd: boolean;
+    /** False when the subscription was made with a provider this server no longer uses. */
+    manageable: boolean;
+  } | null;
+}

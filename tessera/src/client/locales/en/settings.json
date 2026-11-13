@@ -39,5 +39,14 @@
   "deleteConfirmBody": "Your sets, folders, classes and study history will be removed permanently.",
   "deletePassword": "Enter your password to confirm",
   "deleteTypeEmail": "Type your email address to confirm",
-  "deleteDone": "Your account has been deleted."
+  "deleteDone": "Your account has been deleted.",
+  "newPassword": "New password",
+  "renews": "Renews on {date}.",
+  "ends": "Premium ends on {date}. You won't be charged again.",
+  "seePremium": "See what Premium includes",
+  "billingUpdated": "Your subscription was updated.",
+  "billingElsewhere": "This subscription was set up with a payment provider this server no longer uses. Contact support to change it.",
+  "deleteGoogle": "You sign in with Google. Type your email address to confirm.",
+  "deleteFresh": "For your safety, sign out and back in, then delete your account within 10 minutes.",
+  "exportStarted": "Your download has started."
 }
