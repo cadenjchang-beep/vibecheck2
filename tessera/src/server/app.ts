@@ -12,6 +12,7 @@ import { mountSeoRoutes, renderPage } from './http/pages';
 import { mountClient } from './http/static';
 import { consentRoutes, meRoutes } from './routes/me';
 import { mediaRoutes } from './routes/media';
+import { reviewRoutes } from './routes/review';
 import { cardRoutes, setRoutes } from './routes/sets';
 import { studyRoutes } from './routes/study';
 import { enforceRateLimit } from './services/rate-limit';
@@ -74,6 +75,7 @@ export function createApp() {
   app.route('/api/cards', cardRoutes);
   app.route('/api/media', mediaRoutes);
   app.route('/api/study', studyRoutes);
+  app.route('/api/review', reviewRoutes);
 
   // Uncaught errors from the browser, so client-side failures show up in the logs too.
   app.post('/api/client-errors', async (c) => {

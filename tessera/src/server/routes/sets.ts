@@ -4,6 +4,7 @@ import { listQuerySchema, setInputSchema } from '@shared/schemas';
 import { LIMITS, VISIBILITIES } from '@shared/constants';
 import { optionalViewer, parseJson, parseQuery, requireViewer, type AppEnv } from '../http/context';
 import { enforceRateLimit } from '../services/rate-limit';
+import { getMatchScores } from '../services/review';
 import {
   createSet,
   duplicateSet,
@@ -78,6 +79,11 @@ export const setRoutes = new Hono<AppEnv>()
     const { title } = await parseJson(c, z.object({ title: z.string().trim().max(LIMITS.titleMax).optional() }));
     const id = await duplicateSet(viewer, c.req.param('id'), title);
     return c.json({ id }, 201);
+  })
+
+  .get('/:id/match-scores', async (c) => {
+    const { pairs } = parseQuery(c, z.object({ pairs: z.coerce.number().int().min(2).max(12).default(6) }));
+    return c.json(await getMatchScores(optionalViewer(c), c.req.param('id'), pairs));
   })
 
   .put('/:id/star', async (c) => {

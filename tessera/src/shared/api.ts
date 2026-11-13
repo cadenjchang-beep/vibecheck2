@@ -140,3 +140,32 @@ export interface StudySessionDto {
   incorrectCount: number;
   score: number | null;
 }
+
+export interface ReviewItem {
+  card: CardDto;
+  setId: string;
+  setTitle: string;
+  termLang: string;
+  definitionLang: string;
+  progress: CardProgressDto | null;
+}
+
+export interface ReviewQueueResponse {
+  items: ReviewItem[];
+  /** All cards due now, which can be more than one page of `items`. */
+  dueCount: number;
+}
+
+export interface ReviewSummary {
+  dueCount: number;
+  sets: Array<{ setId: string; title: string; dueCount: number; cardCount: number }>;
+  /** When the next card comes due, if nothing is due now. */
+  nextDueAt: string | null;
+}
+
+export interface MatchScoresResponse {
+  /** The viewer's own best times for this board size, fastest first. */
+  personal: Array<{ timeMs: number; mistakes: number; createdAt: string }>;
+  /** Fastest time per player among everyone who can see the set. `name` is null for hidden names. */
+  leaders: Array<{ name: string | null; timeMs: number; isYou: boolean }>;
+}

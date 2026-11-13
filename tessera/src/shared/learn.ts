@@ -170,7 +170,7 @@ function pickCard(state: LearnState): string | null {
   return candidates.reduce((a, b) => (item(a).retryAt! <= item(b).retryAt! ? a : b));
 }
 
-function averageLength(cards: LearnCard[], side: Side): number {
+export function averageLength(cards: LearnCard[], side: Side): number {
   if (cards.length === 0) return 0;
   return cards.reduce((sum, card) => sum + [...card[side]].length, 0) / cards.length;
 }
@@ -196,8 +196,8 @@ function answerSideFor(state: LearnState, kind: QuestionKind, cards: LearnCard[]
   return averageLength(cards, 'term') <= averageLength(cards, 'definition') ? 'term' : 'definition';
 }
 
-/** Wrong answers for `card`: other cards' answers first, then any supplied extras. */
-function wrongOptions(card: LearnCard, cards: LearnCard[], side: Side, count: number, rng: Rng, extra: string[] = []): McOption[] {
+/** Wrong answers for `card`: any supplied extras first, then other cards' answers. */
+export function wrongOptions(card: LearnCard, cards: LearnCard[], side: Side, count: number, rng: Rng, extra: string[] = []): McOption[] {
   const correct = normalizeAnswer(card[side]);
   const seen = new Set([correct]);
   const out: McOption[] = [];
