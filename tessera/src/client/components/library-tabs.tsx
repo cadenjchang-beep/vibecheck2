@@ -1,4 +1,5 @@
 import { NavLink } from 'react-router';
+import { BUILT } from '@/lib/built';
 import { useI18n } from '@/lib/i18n';
 import { cn } from '@/lib/utils';
 
@@ -7,9 +8,11 @@ export function LibraryTabs() {
   const { t } = useI18n();
   const tabs = [
     { to: '/library', label: t('sets.tabSets') },
-    { to: '/folders', label: t('sets.tabFolders') },
-    { to: '/classes', label: t('sets.tabClasses') },
+    ...(BUILT.folders ? [{ to: '/folders', label: t('sets.tabFolders') }] : []),
+    ...(BUILT.classes ? [{ to: '/classes', label: t('sets.tabClasses') }] : []),
   ];
+  // A single tab is not a choice.
+  if (tabs.length < 2) return null;
   return (
     <nav aria-label={t('sets.yourLibrary')} className="flex gap-1 border-b border-border">
       {tabs.map((tab) => (

@@ -78,5 +78,11 @@
   "languagePair": "{term} → {definition}",
   "notEnoughCards": "Add at least {count, plural, one {# card} other {# cards}} to use this mode.",
   "signUpToSave": "Sign up free to save your progress",
-  "stageLegend": "Stages"
+  "stageLegend": "Stages",
+  "homeGreeting": "Welcome back, {name}",
+  "homeRecent": "Jump back in",
+  "homeYours": "Your sets",
+  "homeSeeAll": "See all",
+  "homeEmptyTitle": "Make your first study set",
+  "homeEmptyBody": "Type a few terms, or paste a whole list from a spreadsheet. You can be studying in under a minute."
 }

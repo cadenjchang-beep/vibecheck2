@@ -1,0 +1,23 @@
+{
+  "operatorNote": "This page is a plain-language summary that ships with the software. Whoever runs this site must review it with a lawyer and add their contact details before launch.",
+  "privacyTitle": "Privacy",
+  "privacyIntro": "Tessera is a study tool. We collect only what it needs to work, we never sell personal data, and there is no third-party advertising or tracking.",
+  "privacyCollectTitle": "What we store",
+  "privacyCollect1": "Your name, email address and a securely hashed password (or your Google account identity if you sign in with Google).",
+  "privacyCollect2": "Your birth month and year, so that the right protections apply to younger learners.",
+  "privacyCollect3": "The study sets you create, and your study progress: which cards you answered, when, and how.",
+  "privacyUseTitle": "How it is used",
+  "privacyUse": "To show you your sets, schedule your reviews, and keep your progress in step across your devices. Private sets are visible only to you. Sets you share by link or make public are visible to the people you share them with.",
+  "privacyChildrenTitle": "Children under 13",
+  "privacyChildren": "An account for someone under 13 stays locked until a parent or guardian approves it by email. Under-13 accounts cannot publish sets publicly, and their names are hidden from other people on shared leaderboards.",
+  "privacyChoicesTitle": "Your choices",
+  "privacyChoices": "You can change or delete your sets at any time. To delete your account or get a copy of your data, contact the operator of this site.",
+  "termsTitle": "Terms of use",
+  "termsIntro": "By using Tessera you agree to use it for studying and teaching, and to respect other people who do the same.",
+  "termsContentTitle": "Your content",
+  "termsContent": "The sets you create are yours. When you make a set public or share its link, you allow others to view, study and copy it. Only share material you have the right to share.",
+  "termsConductTitle": "Acceptable use",
+  "termsConduct": "Do not post unlawful, hateful or harassing material, do not try to access other people's private data, and do not disrupt the service. Accounts that do may be suspended.",
+  "termsServiceTitle": "The service",
+  "termsService": "Tessera is provided as is, without warranty. Keep your own copy of anything important: sets can be exported as CSV at any time."
+}

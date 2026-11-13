@@ -23,6 +23,7 @@ import { Link, NavLink, Outlet, ScrollRestoration, useNavigate } from 'react-rou
 import { toast } from 'sonner';
 import { api } from '@/lib/api';
 import { authClient } from '@/lib/auth';
+import { BUILT } from '@/lib/built';
 import { useI18n } from '@/lib/i18n';
 import { isActive, useMe } from '@/lib/me';
 import { useOnline } from '@/lib/online';
@@ -64,8 +65,8 @@ function useNavItems() {
   return [
     { to: '/home', label: t('nav.home'), icon: House },
     { to: '/library', label: t('nav.library'), icon: Library },
-    { to: '/review', label: t('nav.review'), icon: RotateCcw },
-    { to: '/stats', label: t('nav.stats'), icon: ChartColumn },
+    ...(BUILT.review ? [{ to: '/review', label: t('nav.review'), icon: RotateCcw }] : []),
+    ...(BUILT.stats ? [{ to: '/stats', label: t('nav.stats'), icon: ChartColumn }] : []),
   ];
 }
 
@@ -97,6 +98,17 @@ function SearchForm({ className, autoFocus }: { className?: string; autoFocus?: 
 
 function CreateMenu({ user }: { user: MeUser }) {
   const { t } = useI18n();
+  // With only sets to create, the button goes straight there.
+  if (!BUILT.folders && !BUILT.classes) {
+    return (
+      <Button asChild className="hidden lg:inline-flex">
+        <Link to="/sets/new">
+          <Plus aria-hidden="true" />
+          {t('nav.createSet')}
+        </Link>
+      </Button>
+    );
+  }
   return (
     <Menu>
       <MenuTrigger asChild>
@@ -170,19 +182,23 @@ function AccountMenu({ user }: { user: MeUser }) {
           <p className="truncate text-sm text-muted-foreground">{user.email}</p>
         </div>
         <MenuSeparator />
-        <MenuItem asChild>
-          <Link to="/settings">
-            <Settings aria-hidden="true" />
-            {t('nav.settings')}
-          </Link>
-        </MenuItem>
-        <MenuItem asChild>
-          <Link to="/classes">
-            <GraduationCap aria-hidden="true" />
-            {t('nav.classes')}
-          </Link>
-        </MenuItem>
-        {user.plan === 'free' ? (
+        {BUILT.settings ? (
+          <MenuItem asChild>
+            <Link to="/settings">
+              <Settings aria-hidden="true" />
+              {t('nav.settings')}
+            </Link>
+          </MenuItem>
+        ) : null}
+        {BUILT.classes ? (
+          <MenuItem asChild>
+            <Link to="/classes">
+              <GraduationCap aria-hidden="true" />
+              {t('nav.classes')}
+            </Link>
+          </MenuItem>
+        ) : null}
+        {BUILT.upgrade && user.plan === 'free' ? (
           <MenuItem asChild>
             <Link to="/upgrade">
               <Crown aria-hidden="true" className="!text-gold" />
@@ -280,8 +296,8 @@ function Header({ user }: { user: MeUser | null }) {
             </ul>
           </nav>
         ) : null}
-        <SearchForm className="ms-auto hidden max-w-md flex-1 md:block" />
-        <div className="ms-auto flex items-center gap-1 md:ms-0">
+        {BUILT.search ? <SearchForm className="ms-auto hidden max-w-md flex-1 md:block" /> : null}
+        <div className={cn('ms-auto flex items-center gap-1', BUILT.search && 'md:ms-0')}>
           {!online ? (
             <Tooltip label={t('common.offlineHint')}>
               <span
@@ -294,11 +310,13 @@ function Header({ user }: { user: MeUser | null }) {
               </span>
             </Tooltip>
           ) : null}
-          <Button variant="ghost" size="icon" asChild className="md:hidden">
-            <Link to="/search" aria-label={t('nav.search')}>
-              <Search aria-hidden="true" />
-            </Link>
-          </Button>
+          {BUILT.search ? (
+            <Button variant="ghost" size="icon" asChild className="md:hidden">
+              <Link to="/search" aria-label={t('nav.search')}>
+                <Search aria-hidden="true" />
+              </Link>
+            </Button>
+          ) : null}
           {user ? (
             <>
               <CreateMenu user={user} />
@@ -306,9 +324,11 @@ function Header({ user }: { user: MeUser | null }) {
             </>
           ) : (
             <>
-              <Button variant="ghost" asChild className="hidden sm:inline-flex">
-                <Link to="/browse">{t('nav.browse')}</Link>
-              </Button>
+              {BUILT.search ? (
+                <Button variant="ghost" asChild className="hidden sm:inline-flex">
+                  <Link to="/browse">{t('nav.browse')}</Link>
+                </Button>
+              ) : null}
               <Button variant="ghost" asChild>
                 <Link to="/login">{t('nav.logIn')}</Link>
               </Button>
@@ -372,9 +392,11 @@ export function Footer() {
       <div className="container-page flex flex-col items-center justify-between gap-3 py-6 text-sm text-muted-foreground sm:flex-row">
         <p>{t('nav.footerNote')}</p>
         <nav aria-label="Legal" className="flex gap-5">
-          <Link to="/browse" className="hover:text-foreground hover:underline">
-            {t('nav.browse')}
-          </Link>
+          {BUILT.search ? (
+            <Link to="/browse" className="hover:text-foreground hover:underline">
+              {t('nav.browse')}
+            </Link>
+          ) : null}
           <Link to="/privacy" className="hover:text-foreground hover:underline">
             {t('nav.privacy')}
           </Link>

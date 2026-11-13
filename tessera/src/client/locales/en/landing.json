@@ -36,5 +36,12 @@
   "pricingPerMonth": "{price} / month",
   "finalTitle": "Your first set is a minute away",
   "sampleTerm": "mitochondria",
-  "sampleDefinition": "The organelle that produces most of a cell's energy (ATP)"
+  "sampleDefinition": "The organelle that produces most of a cell's energy (ATP)",
+  "modesTitleShort": "Study modes that adapt to you",
+  "how1BodyBasic": "Type your cards, paste them straight from a spreadsheet, or import a CSV file.",
+  "how3TitleBasic": "Pick up where you left off",
+  "how3BodyBasic": "Progress is saved card by card, so every session starts from what you already know.",
+  "trustBasic": "Free to use. No ads, and your data is never sold.",
+  "heroBodyBasic": "Turn your notes into a study set in under a minute. Then let flashcards and adaptive practice do what they do best: make it stick.",
+  "how1TitleBasic": "Paste, type or import"
 }

@@ -1,5 +1,6 @@
 import { Brain, ClipboardCheck, Headphones, Layers, Puzzle, RotateCcw, type LucideIcon } from 'lucide-react';
 import type { StudyMode } from '@shared/constants';
+import { BUILT } from './built';
 import type { MessageKey } from './i18n';
 
 export interface ModeInfo {
@@ -18,3 +19,6 @@ export const MODES: ModeInfo[] = [
   { mode: 'review', icon: RotateCcw, label: 'landing.modeReview', description: 'landing.modeReviewBody' },
   { mode: 'listen', icon: Headphones, label: 'landing.modeListen', description: 'landing.modeListenBody' },
 ];
+
+/** The modes that can be opened today. */
+export const AVAILABLE_MODES = MODES.filter(({ mode }) => mode === 'flashcards' || mode === 'learn' || BUILT[mode]);

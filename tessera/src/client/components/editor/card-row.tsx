@@ -8,6 +8,7 @@ import { RichEditor } from '@/components/rich-editor';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Tooltip } from '@/components/ui/controls';
+import { BUILT } from '@/lib/built';
 import { useI18n } from '@/lib/i18n';
 import { useEntitlements, useErrorMessage } from '@/lib/me';
 import { MEDIA_ACCEPT, uploadMedia } from '@/lib/media';
@@ -36,7 +37,7 @@ function MediaControls({ card, side, onChange }: MediaControlsProps) {
   const pick = (kind: 'image' | 'audio') => {
     const entitled = kind === 'image' ? entitlements.imageUploads : entitlements.audioUploads;
     if (!entitled) {
-      toast(t('editor.mediaPremium'), { action: { label: t('nav.upgrade'), onClick: () => window.location.assign('/upgrade') } });
+      toast(t('editor.mediaPremium'), BUILT.upgrade ? { action: { label: t('nav.upgrade'), onClick: () => window.location.assign('/upgrade') } } : undefined);
       return;
     }
     (kind === 'image' ? imageInput : audioInput).current?.click();

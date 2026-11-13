@@ -28,6 +28,7 @@ import { Segmented, Switch, ToggleRow } from '@/components/ui/controls';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Alert, EmptyState } from '@/components/ui/feedback';
 import { Input } from '@/components/ui/input';
+import { BUILT } from '@/lib/built';
 import { useI18n } from '@/lib/i18n';
 import { isActive, useUser } from '@/lib/me';
 import { canSpeak, speak } from '@/lib/speech';
@@ -318,12 +319,12 @@ function Learn({ set }: { set: SetDetail }) {
           </Button>
         }
         steps={[
-          { to: `/sets/${set.id}/test`, label: t('flashcards.tryTest'), icon: <ClipboardCheck aria-hidden="true" /> },
-          { to: `/sets/${set.id}/review`, label: t('learn.goToReview'), icon: <RotateCcw aria-hidden="true" /> },
+          ...(BUILT.test ? [{ to: `/sets/${set.id}/test`, label: t('flashcards.tryTest'), icon: <ClipboardCheck aria-hidden="true" /> }] : []),
+          ...(BUILT.review ? [{ to: `/sets/${set.id}/review`, label: t('learn.goToReview'), icon: <RotateCcw aria-hidden="true" /> }] : []),
         ]}
       >
         <Mosaic stages={mosaicStages} className="mt-5" />
-        {signedIn ? <p className="mt-4 text-sm text-muted-foreground">{t('learn.doneReview')}</p> : null}
+        {signedIn && BUILT.review ? <p className="mt-4 text-sm text-muted-foreground">{t('learn.doneReview')}</p> : null}
       </SessionSummary>,
     );
   }

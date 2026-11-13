@@ -1,0 +1,17 @@
+{
+  "play": "Play",
+  "pause": "Pause",
+  "previous": "Previous card",
+  "next": "Next card",
+  "speed": "Speed",
+  "speedValue": "{value}×",
+  "order": "Read first",
+  "repeat": "Repeat the set",
+  "unsupportedTitle": "Speech isn't available in this browser",
+  "unsupportedBody": "Listen mode uses your device's built-in voices. Try a different browser, or add audio to your cards.",
+  "noVoice": "Your device has no voice for {language}, so it may sound wrong or stay silent.",
+  "nowPlaying": "Now playing: card {current} of {total}",
+  "upNext": "All cards",
+  "playCard": "Play from card {number}: {term}",
+  "finished": "That was the last card."
+}

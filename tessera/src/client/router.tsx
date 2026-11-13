@@ -63,6 +63,8 @@ export const router = createBrowserRouter([
           },
           // Public and link-shared sets open without an account.
           { path: 'sets/:id', lazy: page(() => import('./routes/set-detail')) },
+          { path: 'privacy', lazy: async () => ({ Component: (await import('./routes/legal')).Privacy }) },
+          { path: 'terms', lazy: async () => ({ Component: (await import('./routes/legal')).Terms }) },
           { path: '*', lazy: page(() => import('./routes/not-found')) },
         ],
       },

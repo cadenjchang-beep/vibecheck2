@@ -33,7 +33,8 @@ import { Menu, MenuContent, MenuItem, MenuSeparator, MenuTrigger } from '@/compo
 import { ApiError } from '@/lib/api';
 import { useI18n } from '@/lib/i18n';
 import { isActive, useErrorMessage, useUser } from '@/lib/me';
-import { MODES } from '@/lib/modes';
+import { BUILT } from '@/lib/built';
+import { AVAILABLE_MODES } from '@/lib/modes';
 import { usePageTitle } from '@/lib/page';
 import { isStudyable, useDeleteSet, useDuplicateSet, useSet, useStarCard, useStarSet } from '@/lib/sets';
 import { canSpeak, speak } from '@/lib/speech';
@@ -179,12 +180,14 @@ function Header({ set }: { set: SetDetail }) {
                     <Copy aria-hidden="true" />
                     {t('sets.duplicate')}
                   </MenuItem>
-                  <MenuItem asChild>
-                    <Link to={`/folders?add=${set.id}`}>
-                      <FolderPlus aria-hidden="true" />
-                      {t('sets.addToFolder')}
-                    </Link>
-                  </MenuItem>
+                  {BUILT.folders ? (
+                    <MenuItem asChild>
+                      <Link to={`/folders?add=${set.id}`}>
+                        <FolderPlus aria-hidden="true" />
+                        {t('sets.addToFolder')}
+                      </Link>
+                    </MenuItem>
+                  ) : null}
                 </>
               ) : null}
               <MenuItem onSelect={exportCsv} disabled={set.cards.length === 0}>
@@ -222,8 +225,8 @@ function ModePicker({ set, studyable }: { set: SetDetail; studyable: number }) {
       <h2 id="study-title" className="sr-only">
         {t('sets.studyTitle')}
       </h2>
-      <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
-        {MODES.map(({ mode, icon: Icon, label }) => {
+      <ul className={cn('grid grid-cols-2 gap-3', AVAILABLE_MODES.length > 2 && 'sm:grid-cols-3 lg:grid-cols-6')}>
+        {AVAILABLE_MODES.map(({ mode, icon: Icon, label }) => {
           const needed = MIN_CARDS[mode];
           const enabled = studyable >= needed;
           const body = (
