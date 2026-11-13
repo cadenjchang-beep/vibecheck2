@@ -24,7 +24,10 @@ import { toast } from 'sonner';
 import { api } from '@/lib/api';
 import { authClient } from '@/lib/auth';
 import { BUILT } from '@/lib/built';
+import { useQuery } from '@tanstack/react-query';
+import type { ReviewSummary } from '@shared/api';
 import { useI18n } from '@/lib/i18n';
+import { keys } from '@/lib/query';
 import { isActive, useMe } from '@/lib/me';
 import { useOnline } from '@/lib/online';
 import { useAnnouncedTitle } from '@/lib/page';
@@ -60,12 +63,29 @@ export function SkipLink() {
   );
 }
 
-function useNavItems() {
+interface NavItem {
+  to: string;
+  label: string;
+  icon: typeof House;
+  /** A count shown on the item, with the phrase a screen reader should hear. */
+  badge?: { count: number; label: string };
+}
+
+function useNavItems(signedIn: boolean): NavItem[] {
   const { t } = useI18n();
+  const review = useQuery({
+    queryKey: [...keys.review(), 'summary'],
+    queryFn: ({ signal }) => api<ReviewSummary>('/api/review/summary', { signal }),
+    enabled: signedIn && BUILT.review,
+    staleTime: 60_000,
+  });
+  const due = review.data?.dueCount ?? 0;
   return [
     { to: '/home', label: t('nav.home'), icon: House },
     { to: '/library', label: t('nav.library'), icon: Library },
-    ...(BUILT.review ? [{ to: '/review', label: t('nav.review'), icon: RotateCcw }] : []),
+    ...(BUILT.review
+      ? [{ to: '/review', label: t('nav.review'), icon: RotateCcw, badge: due > 0 ? { count: due, label: t('nav.dueBadge', { count: due }) } : undefined }]
+      : []),
     ...(BUILT.stats ? [{ to: '/stats', label: t('nav.stats'), icon: ChartColumn }] : []),
   ];
 }
@@ -267,7 +287,7 @@ function VerifyBanner({ user }: { user: MeUser }) {
 
 function Header({ user }: { user: MeUser | null }) {
   const { t } = useI18n();
-  const items = useNavItems();
+  const items = useNavItems(Boolean(user));
   const online = useOnline();
   return (
     <header className="no-print sticky top-0 z-40 border-b border-border bg-background/90 backdrop-blur-md">
@@ -290,6 +310,7 @@ function Header({ user }: { user: MeUser | null }) {
                     }
                   >
                     {item.label}
+                    {item.badge ? <NavBadge badge={item.badge} className="ms-1.5" /> : null}
                   </NavLink>
                 </li>
               ))}
@@ -344,10 +365,19 @@ function Header({ user }: { user: MeUser | null }) {
 }
 
 /** Thumb-reachable navigation on phones and tablets. */
+function NavBadge({ badge, className }: { badge: NonNullable<NavItem['badge']>; className?: string }) {
+  return (
+    <span className={cn('inline-flex min-w-5 items-center justify-center rounded-full bg-primary px-1.5 text-xs leading-5 font-bold text-primary-foreground', className)}>
+      <span aria-hidden="true">{badge.count > 99 ? '99+' : badge.count}</span>
+      <span className="sr-only">{badge.label}</span>
+    </span>
+  );
+}
+
 function BottomTabs() {
   const { t } = useI18n();
-  const items = useNavItems();
-  const tab = (to: string, label: string, Icon: typeof House) => (
+  const items = useNavItems(true);
+  const tab = ({ to, label, icon: Icon, badge }: NavItem) => (
     <li key={to} className="flex-1">
       <NavLink
         to={to}
@@ -358,7 +388,10 @@ function BottomTabs() {
           )
         }
       >
-        <Icon className="size-5.5" aria-hidden="true" />
+        <span className="relative">
+          <Icon className="size-5.5" aria-hidden="true" />
+          {badge ? <NavBadge badge={badge} className="absolute -end-3.5 -top-1.5" /> : null}
+        </span>
         {label}
       </NavLink>
     </li>
@@ -369,7 +402,7 @@ function BottomTabs() {
       className="no-print pb-safe fixed inset-x-0 bottom-0 z-40 border-t border-border bg-background/95 backdrop-blur-md lg:hidden"
     >
       <ul className="mx-auto flex max-w-xl items-center px-1">
-        {items.slice(0, 2).map((i) => tab(i.to, i.label, i.icon))}
+        {items.slice(0, 2).map(tab)}
         <li className="flex flex-1 justify-center">
           <Link
             to="/sets/new"
@@ -379,7 +412,7 @@ function BottomTabs() {
             <Plus className="size-6" aria-hidden="true" />
           </Link>
         </li>
-        {items.slice(2).map((i) => tab(i.to, i.label, i.icon))}
+        {items.slice(2).map(tab)}
       </ul>
     </nav>
   );

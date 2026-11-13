@@ -49,6 +49,14 @@ export const router = createBrowserRouter([
       // Study modes fill the screen: no site navigation, nothing to distract.
       { path: 'sets/:id/flashcards', lazy: page(() => import('./routes/study/flashcards')) },
       { path: 'sets/:id/learn', lazy: page(() => import('./routes/study/learn')) },
+      { path: 'sets/:id/test', lazy: page(() => import('./routes/study/test')) },
+      { path: 'sets/:id/match', lazy: page(() => import('./routes/study/match')) },
+      { path: 'sets/:id/review', lazy: page(() => import('./routes/study/review')) },
+      { path: 'sets/:id/listen', lazy: page(() => import('./routes/study/listen')) },
+      {
+        element: <RequireAuth />,
+        children: [{ path: 'review/session', lazy: async () => ({ Component: (await import('./routes/review')).ReviewQueueSession }) }],
+      },
       {
         element: <AppLayout />,
         children: [
@@ -57,6 +65,7 @@ export const router = createBrowserRouter([
             children: [
               { path: 'home', lazy: page(() => import('./routes/home')) },
               { path: 'library', lazy: page(() => import('./routes/library')) },
+              { path: 'review', lazy: page(() => import('./routes/review')) },
               { path: 'sets/new', lazy: page(() => import('./routes/set-editor')) },
               { path: 'sets/:id/edit', lazy: page(() => import('./routes/set-editor')) },
             ],

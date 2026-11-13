@@ -168,6 +168,7 @@ export function SessionSummary({
   primary,
   steps,
   setId,
+  back,
 }: {
   title: ReactNode;
   body?: ReactNode;
@@ -176,6 +177,7 @@ export function SessionSummary({
   primary?: ReactNode;
   steps?: NextStep[];
   setId: string;
+  back?: { to: string; label: string };
 }) {
   const { t } = useI18n();
   return (
@@ -199,7 +201,7 @@ export function SessionSummary({
         <div className="mt-6 flex flex-col gap-2">
           {primary}
           <Button variant="secondary" asChild>
-            <Link to={`/sets/${setId}`}>{t('study.backToSet')}</Link>
+            <Link to={back?.to ?? `/sets/${setId}`}>{back?.label ?? t('study.backToSet')}</Link>
           </Button>
         </div>
       </div>
@@ -221,7 +223,7 @@ export function SessionSummary({
           </ul>
         </nav>
       ) : null}
-      <GuestNote setId={setId} />
+      {setId ? <GuestNote setId={setId} /> : null}
     </section>
   );
 }

@@ -4,10 +4,10 @@
  * not exist yet. Flip a flag when its phase lands (see docs/STATUS.md).
  */
 export const BUILT = {
-  test: false,
-  match: false,
-  review: false,
-  listen: false,
+  test: true,
+  match: true,
+  review: true,
+  listen: true,
   search: false,
   folders: false,
   classes: false,
