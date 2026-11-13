@@ -1,6 +1,7 @@
 /** Request validation shared by the server (enforcement) and the client (types). */
 import { z } from 'zod';
-import { LANGUAGE_CODES, LIMITS, SUBJECTS, VISIBILITIES } from './constants';
+import { LANGUAGE_CODES, LIMITS, STUDY_MODES, SUBJECTS, VISIBILITIES } from './constants';
+import { ANSWER_KINDS } from './study';
 
 const id = z.string().min(8).max(40).regex(/^[A-Za-z0-9_-]+$/);
 const optionalId = id.nullable().optional();
@@ -40,3 +41,55 @@ export const listQuerySchema = z.object({
   cursor: z.string().max(200).optional(),
   limit: z.coerce.number().int().min(1).max(60).default(LIMITS.pageSize),
 });
+
+// ── Studying ─────────────────────────────────────────────────────────────────
+
+const uuid = z.string().regex(/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i, 'Expected a UUID');
+const eventBase = { id: uuid, cardId: id, setId: id, at: z.string().datetime() };
+
+export const studyEventSchema = z.discriminatedUnion('type', [
+  z.object({
+    ...eventBase,
+    type: z.literal('answer'),
+    mode: z.enum(STUDY_MODES),
+    kind: z.enum(ANSWER_KINDS),
+    correct: z.boolean(),
+  }),
+  z.object({
+    ...eventBase,
+    type: z.literal('rating'),
+    mode: z.literal('review'),
+    rating: z.union([z.literal(1), z.literal(2), z.literal(3), z.literal(4)]),
+  }),
+]);
+
+export const sessionInputSchema = z.object({
+  clientId: uuid,
+  setId: id.nullable(),
+  mode: z.enum(STUDY_MODES),
+  startedAt: z.string().datetime(),
+  endedAt: z.string().datetime(),
+  durationSeconds: z.number().int().min(0).max(6 * 3600),
+  cardsStudied: z.number().int().min(0).max(20_000),
+  correctCount: z.number().int().min(0).max(20_000),
+  incorrectCount: z.number().int().min(0).max(20_000),
+  score: z.number().min(0).max(100).nullable().optional(),
+  details: z.record(z.string(), z.unknown()).optional(),
+});
+
+export const matchScoreInputSchema = z.object({
+  clientId: uuid,
+  setId: id,
+  timeMs: z.number().int().min(1000).max(3_600_000),
+  pairs: z.number().int().min(2).max(12),
+  mistakes: z.number().int().min(0).max(1000),
+});
+export type MatchScoreInput = z.infer<typeof matchScoreInputSchema>;
+
+/** Everything a device has recorded since it last reached the server. */
+export const syncInputSchema = z.object({
+  events: z.array(studyEventSchema).max(500).default([]),
+  sessions: z.array(sessionInputSchema).max(100).default([]),
+  matchScores: z.array(matchScoreInputSchema).max(100).default([]),
+});
+export type SyncInput = z.infer<typeof syncInputSchema>;

@@ -1,13 +1,24 @@
-import type { ComponentType } from 'react';
+import { useEffect, type ComponentType } from 'react';
 import { createBrowserRouter, Outlet } from 'react-router';
-import { AppLayout, RouteAnnouncer } from './components/app-layout';
+import { AppLayout, RouteAnnouncer, syncTimezone } from './components/app-layout';
+import { isActive, useUser } from './lib/me';
+import { setOutboxUser } from './lib/outbox';
 import { RouteError } from './components/error-boundary';
 import { GuestOnly, RequireAuth } from './components/guards';
 
 /** Route-level code splitting: each page is its own chunk. */
 const page = (load: () => Promise<{ default: ComponentType }>) => async () => ({ Component: (await load()).default });
 
+/** Keeps device-level state in step with whoever is signed in. */
 function Root() {
+  const user = useUser();
+  const userId = isActive(user) ? user.id : null;
+  useEffect(() => {
+    // Study activity is queued per user, so it is never sent as someone else.
+    setOutboxUser(userId);
+    if (isActive(user)) syncTimezone(user);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userId]);
   return (
     <>
       <RouteAnnouncer />
@@ -35,6 +46,9 @@ export const router = createBrowserRouter([
       { path: 'waiting', lazy: page(() => import('./routes/waiting')) },
       { path: 'consent/:token', lazy: page(() => import('./routes/consent')) },
       { path: 'sets/:id/print', lazy: page(() => import('./routes/set-print')) },
+      // Study modes fill the screen: no site navigation, nothing to distract.
+      { path: 'sets/:id/flashcards', lazy: page(() => import('./routes/study/flashcards')) },
+      { path: 'sets/:id/learn', lazy: page(() => import('./routes/study/learn')) },
       {
         element: <AppLayout />,
         children: [
