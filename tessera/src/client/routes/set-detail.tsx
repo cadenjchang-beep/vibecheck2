@@ -8,6 +8,7 @@ import {
   Printer,
   Share2,
   Sparkles,
+  WandSparkles,
   Star,
   Trash2,
   Volume2,
@@ -34,6 +35,7 @@ import { Select } from '@/components/ui/input';
 import { Menu, MenuContent, MenuItem, MenuSeparator, MenuTrigger } from '@/components/ui/menu';
 import { ApiError } from '@/lib/api';
 import { useI18n } from '@/lib/i18n';
+import { useAiAvailable, useWriteDistractors } from '@/lib/ai';
 import { isActive, useErrorMessage, useUser } from '@/lib/me';
 import { BUILT } from '@/lib/built';
 import { AVAILABLE_MODES } from '@/lib/modes';
@@ -102,6 +104,19 @@ function Header({ set }: { set: SetDetail }) {
   };
 
   const deleteSet = () => remove.mutate(set, { onSuccess: () => navigate('/library', { replace: true }) });
+
+  const aiAvailable = useAiAvailable() && signedIn;
+  const writeDistractors = useWriteDistractors(set.id);
+  const improveOptions = () => {
+    const id = toast.loading(t('ai.distractorsWorking'));
+    writeDistractors()
+      .then((result) => {
+        if (result.usage === null) toast.success(t('ai.distractorsNone'), { id });
+        else if (result.missing > 0) toast.success(t('ai.distractorsPartial', { count: result.missing }), { id });
+        else toast.success(t('ai.distractorsDone'), { id });
+      })
+      .catch((err) => toast.error(errorMessage(err), { id }));
+  };
 
   return (
     <header>
@@ -190,6 +205,12 @@ function Header({ set }: { set: SetDetail }) {
                     </MenuItem>
                   ) : null}
                 </>
+              ) : null}
+              {aiAvailable && set.cards.length >= 2 ? (
+                <MenuItem onSelect={improveOptions}>
+                  <WandSparkles aria-hidden="true" />
+                  {t('ai.distractorsAction')}
+                </MenuItem>
               ) : null}
               <MenuItem onSelect={exportCsv} disabled={set.cards.length === 0}>
                 <Download aria-hidden="true" />

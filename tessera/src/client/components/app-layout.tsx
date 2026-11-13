@@ -17,6 +17,7 @@ import {
   Sun,
   UserPlus,
   WifiOff,
+  Sparkles,
 } from 'lucide-react';
 import { useState, type FormEvent, type ReactNode } from 'react';
 import { Link, NavLink, Outlet, ScrollRestoration, useNavigate } from 'react-router';
@@ -28,6 +29,7 @@ import { useQuery } from '@tanstack/react-query';
 import type { ReviewSummary } from '@shared/api';
 import { useI18n } from '@/lib/i18n';
 import { keys } from '@/lib/query';
+import { useAiAvailable } from '@/lib/ai';
 import { isActive, useMe } from '@/lib/me';
 import { useOnline } from '@/lib/online';
 import { useAnnouncedTitle } from '@/lib/page';
@@ -118,6 +120,7 @@ function SearchForm({ className, autoFocus }: { className?: string; autoFocus?: 
 
 function CreateMenu({ user }: { user: MeUser }) {
   const { t } = useI18n();
+  const aiAvailable = useAiAvailable();
   // With only sets to create, the button goes straight there.
   if (!BUILT.folders && !BUILT.classes) {
     return (
@@ -144,6 +147,14 @@ function CreateMenu({ user }: { user: MeUser }) {
             {t('nav.newSet')}
           </Link>
         </MenuItem>
+        {aiAvailable ? (
+          <MenuItem asChild>
+            <Link to="/sets/new?ai=1">
+              <Sparkles aria-hidden="true" />
+              {t('ai.createWithAi')}
+            </Link>
+          </MenuItem>
+        ) : null}
         <MenuItem asChild>
           <Link to="/folders?new=1">
             <FolderPlus aria-hidden="true" />

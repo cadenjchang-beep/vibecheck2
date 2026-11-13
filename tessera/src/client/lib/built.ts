@@ -14,5 +14,5 @@ export const BUILT = {
   stats: true,
   settings: true,
   upgrade: false,
-  ai: false,
+  ai: true,
 } as const;

@@ -9,14 +9,16 @@ import {
   type DragEndEvent,
 } from '@dnd-kit/core';
 import { SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from '@dnd-kit/sortable';
-import { ArrowLeft, ArrowLeftRight, FileUp, Plus } from 'lucide-react';
+import { ArrowLeft, ArrowLeftRight, FileUp, Plus, Sparkles } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from 'react';
-import { Link, Navigate, useBlocker, useNavigate, useParams } from 'react-router';
+import { Link, Navigate, useBlocker, useNavigate, useParams, useSearchParams } from 'react-router';
 import { toast } from 'sonner';
 import type { SetDetail } from '@shared/api';
 import { LANGUAGES, LIMITS, SUBJECTS, type Subject, type Visibility } from '@shared/constants';
 import type { ImportedCard } from '@shared/import';
-import { plainToRich } from '@shared/richtext';
+import type { AiSuggestKind, GeneratedCard } from '@shared/ai';
+import { isRichEmpty, plainToRich, richToPlain } from '@shared/richtext';
+import { GenerateDialog } from '@/components/ai/generate-dialog';
 import { CardRow } from '@/components/editor/card-row';
 import {
   blankCard,
@@ -39,6 +41,7 @@ import { Button } from '@/components/ui/button';
 import { ConfirmDialog } from '@/components/ui/dialog';
 import { Alert, PageLoading } from '@/components/ui/feedback';
 import { Field, Input, Select, Textarea } from '@/components/ui/input';
+import { suggest, useAiAvailable, useRecordUsage } from '@/lib/ai';
 import { ApiError } from '@/lib/api';
 import { useI18n } from '@/lib/i18n';
 import { useErrorMessage, useUser } from '@/lib/me';
@@ -76,6 +79,11 @@ function EditorForm({ set }: { set?: SetDetail }) {
   const [errors, setErrors] = useState<{ title?: string; cards?: string }>({});
   const [importOpen, setImportOpen] = useState(false);
   const [importText, setImportText] = useState('');
+  const [searchParams] = useSearchParams();
+  const aiAvailable = useAiAvailable();
+  const recordUsage = useRecordUsage();
+  const [aiOpen, setAiOpen] = useState(() => searchParams.get('ai') === '1');
+  const [suggesting, setSuggesting] = useState<string | null>(null);
   const [stale, setStale] = useState(false);
   const leaving = useRef(false);
   const focusKey = useRef<string | null>(null);
@@ -159,6 +167,47 @@ function EditorForm({ set }: { set?: SetDetail }) {
     },
     [apply, t],
   );
+
+  const draftRef = useRef(draft);
+  draftRef.current = draft;
+  const suggestFor = useCallback(
+    async (key: string, kind: AiSuggestKind) => {
+      const card = cardsRef.current.find((c) => c.key === key);
+      if (!card) return;
+      const term = richToPlain(card.term).trim();
+      if (!term) {
+        toast(t('ai.suggestNeedsTerm'));
+        return;
+      }
+      setSuggesting(key);
+      try {
+        const { title, termLang, definitionLang } = draftRef.current;
+        const result = await suggest({ kind, term, definition: richToPlain(card.definition).trim(), setTitle: title, termLang, definitionLang });
+        recordUsage(result.usage);
+        const latest = cardsRef.current.find((c) => c.key === key);
+        if (!latest) return;
+        const previous = { definition: latest.definition, aiGenerated: latest.aiGenerated };
+        const text = plainToRich(result.text);
+        const definition = kind === 'definition' || isRichEmpty(latest.definition) ? text : `${latest.definition}<br>${text}`;
+        apply({ type: 'card', key, patch: { definition, aiGenerated: true } });
+        toast.success(t('ai.suggestDone'), { action: { label: t('common.undo'), onClick: () => apply({ type: 'card', key, patch: previous }) } });
+      } catch (err) {
+        toast.error(errorMessage(err));
+      } finally {
+        setSuggesting(null);
+      }
+    },
+    [apply, errorMessage, recordUsage, t],
+  );
+
+  const addGenerated = (generated: GeneratedCard[], suggestedTitle: string | null) => {
+    apply({
+      type: 'append',
+      cards: generated.map((c) => blankCard({ term: plainToRich(c.term), definition: plainToRich(c.definition), aiGenerated: true })),
+    });
+    if (!draftRef.current.title.trim() && suggestedTitle) apply({ type: 'meta', patch: { title: suggestedTitle.slice(0, LIMITS.titleMax) } });
+    toast.success(t('ai.added', { count: generated.length }));
+  };
 
   const pasteRows = useCallback((text: string) => {
     setImportText(text);
@@ -343,6 +392,12 @@ function EditorForm({ set }: { set?: SetDetail }) {
           <FileUp aria-hidden="true" />
           {t('editor.import')}
         </Button>
+        {aiAvailable ? (
+          <Button variant="secondary" onClick={() => setAiOpen(true)}>
+            <Sparkles aria-hidden="true" />
+            {t('ai.generateButton')}
+          </Button>
+        ) : null}
         <Button variant="ghost" size="icon" aria-label={t('editor.swap')} title={t('editor.swap')} onClick={() => apply({ type: 'swap' })}>
           <ArrowLeftRight aria-hidden="true" />
         </Button>
@@ -381,6 +436,8 @@ function EditorForm({ set }: { set?: SetDetail }) {
                   onMove={moveCard}
                   onPasteRows={pasteRows}
                   onTabOut={addCard}
+                  onSuggest={aiAvailable ? suggestFor : undefined}
+                  suggesting={suggesting === card.key}
                 />
             ))}
           </ol>
@@ -403,6 +460,16 @@ function EditorForm({ set }: { set?: SetDetail }) {
         </Button>
       </div>
 
+      {aiAvailable ? (
+        <GenerateDialog
+          open={aiOpen}
+          onOpenChange={setAiOpen}
+          termLang={draft.termLang}
+          definitionLang={draft.definitionLang}
+          room={LIMITS.cardsPerSet - filled}
+          onAdd={addGenerated}
+        />
+      ) : null}
       <ImportDialog open={importOpen} onOpenChange={setImportOpen} initialText={importText} room={LIMITS.cardsPerSet - filled} onImport={importCards} />
 
       <ConfirmDialog

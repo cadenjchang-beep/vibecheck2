@@ -148,6 +148,8 @@ export async function answerLearnQuestion(
   page: Page,
   cards: CardSeed[],
   decide: (term: string, kind: LearnAnswer['kind']) => boolean = () => true,
+  /** Press Continue after the feedback appears. */
+  advance = true,
 ): Promise<LearnAnswer> {
   const prompt = (await page.locator('#learn-prompt').innerText()).trim();
   const card = cards.find((c) => c.term === prompt || c.definition === prompt);
@@ -183,7 +185,7 @@ export async function answerLearnQuestion(
       else await group.getByRole('button').filter({ hasNot: page.getByText(expected, { exact: true }) }).first().click();
     }
   }
-  await page.getByRole('button', { name: 'Continue' }).click();
+  if (advance) await page.getByRole('button', { name: 'Continue' }).click();
   return { term: card.term, kind, correct };
 }
 

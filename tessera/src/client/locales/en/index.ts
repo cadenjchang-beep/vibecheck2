@@ -1,3 +1,4 @@
+import ai from './ai.json';
 import auth from './auth.json';
 import common from './common.json';
 import editor from './editor.json';
@@ -24,5 +25,5 @@ import subjects from './subjects.json';
 import test from './test.json';
 
 /** English is the source catalogue: every key must exist here. */
-const en = { common, nav, auth, onboarding, errors, landing, sets, editor, subjects, stages, print, study, flashcards, learn, test, match, review, listen, legal, home, folders, search, stats, settings };
+const en = { common, nav, auth, onboarding, errors, landing, sets, editor, subjects, stages, print, study, flashcards, learn, test, match, review, listen, legal, home, folders, search, stats, settings, ai };
 export default en;

@@ -4,6 +4,8 @@ import { ArrowDown, ArrowUp, GripVertical, ImagePlus, LoaderCircle, Mic, Sparkle
 import { memo, useRef, useState, type KeyboardEvent } from 'react';
 import { Link } from 'react-router';
 import { toast } from 'sonner';
+import type { AiSuggestKind } from '@shared/ai';
+import { SuggestMenu } from '@/components/ai/suggest-menu';
 import { RichEditor } from '@/components/rich-editor';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -114,6 +116,9 @@ export interface CardRowProps {
   onPasteRows: (text: string) => void;
   /** Tab out of the last definition: add a card and continue typing there. */
   onTabOut: () => void;
+  /** AI help for this card; omitted when AI is unavailable. */
+  onSuggest?: (key: string, kind: AiSuggestKind) => void;
+  suggesting?: boolean;
 }
 
 export const CardRow = memo(function CardRow({
@@ -127,6 +132,8 @@ export const CardRow = memo(function CardRow({
   onMove,
   onPasteRows,
   onTabOut,
+  onSuggest,
+  suggesting = false,
 }: CardRowProps) {
   const { t } = useI18n();
   const number = index + 1;
@@ -172,6 +179,7 @@ export const CardRow = memo(function CardRow({
           </Badge>
         ) : null}
         <div className="ms-auto flex items-center">
+          {onSuggest ? <SuggestMenu number={number} busy={suggesting} onSuggest={(kind) => onSuggest(card.key, kind)} /> : null}
           <Button variant="ghost" size="icon-sm" aria-label={t('editor.moveUp', { number })} disabled={index === 0} onClick={() => onMove(index, index - 1)}>
             <ArrowUp aria-hidden="true" />
           </Button>

@@ -5,6 +5,7 @@ import type { LearnCard, McOption } from '@shared/learn';
 import { randomSeed } from '@shared/random';
 import { cardCount, generateTest, gradeTest, TEST_KINDS, type TestConfig, type TestKind, type TestQuestion, type TestResponses, type TestResult } from '@shared/test';
 import { ExplainButton } from '@/components/ai/explain';
+import { useDistractors } from '@/lib/ai';
 import { SideContent, type Side } from '@/components/study/side-content';
 import { SessionSummary, StudyGate, StudyShell } from '@/components/study/shell';
 import { Button } from '@/components/ui/button';
@@ -58,6 +59,7 @@ function Test({ set }: { set: SetDetail }) {
   const [result, setResult] = useState<TestResult | null>(null);
   const [confirm, setConfirm] = useState(false);
   const [mistakesOnly, setMistakesOnly] = useState(false);
+  const distractors = useDistractors(set.id);
   const [elapsed, setElapsed] = useState(0);
 
   const count = clamp(prefs.count, 1, Math.max(1, pool.length));
@@ -67,7 +69,7 @@ function Test({ set }: { set: SetDetail }) {
 
   const start = () => {
     session.restart();
-    setQuestions(generateTest(pool, { count, types: prefs.types, answerWith: prefs.answerWith }, randomSeed()));
+    setQuestions(generateTest(pool, { count, types: prefs.types, answerWith: prefs.answerWith }, randomSeed(), distractors));
     setResponses({});
     setResult(null);
     setMistakesOnly(false);
@@ -359,6 +361,7 @@ function Test({ set }: { set: SetDetail }) {
           <ExplainButton
             className="mt-3"
             setId={set.id}
+            answerSide={q.answerSide}
             term={card.termPlain}
             definition={card.definitionPlain}
             given={q.kind === 'written' && typeof response === 'string' ? response : q.kind === 'mc' && typeof response === 'number' ? (q.options[response]?.text ?? '') : ''}

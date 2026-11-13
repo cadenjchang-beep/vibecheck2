@@ -19,6 +19,7 @@ import {
   type Side,
 } from '@shared/learn';
 import { randomSeed } from '@shared/random';
+import { ExplainButton } from '@/components/ai/explain';
 import { Mosaic } from '@/components/mosaic';
 import { RichText } from '@/components/rich-text';
 import { StageLegend } from '@/components/stage-legend';
@@ -28,6 +29,7 @@ import { Segmented, Switch, ToggleRow } from '@/components/ui/controls';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Alert, EmptyState } from '@/components/ui/feedback';
 import { Input } from '@/components/ui/input';
+import { useDistractors } from '@/lib/ai';
 import { BUILT } from '@/lib/built';
 import { useI18n } from '@/lib/i18n';
 import { isActive, useUser } from '@/lib/me';
@@ -110,6 +112,10 @@ function Learn({ set }: { set: SetDetail }) {
 
   const [{ cards, turn }, setGame] = useState(() => build(prefs));
   const [feedback, setFeedback] = useState<Feedback | null>(null);
+  // AI-written wrong answers, when the set has them; later questions pick them up.
+  const distractors = useDistractors(set.id);
+  const distractorsRef = useRef(distractors);
+  distractorsRef.current = distractors;
   const [phase, setPhase] = useState<'question' | 'checkpoint' | 'done'>(() => (turn.question ? 'question' : 'done'));
   const [sinceCheckpoint, setSinceCheckpoint] = useState(0);
   const [typed, setTyped] = useState('');
@@ -164,7 +170,7 @@ function Learn({ set }: { set: SetDetail }) {
       setPhase('done');
       return;
     }
-    const step = nextQuestion(after, cards)!;
+    const step = nextQuestion(after, cards, distractorsRef.current)!;
     setGame({ cards, turn: { engine: step.state, question: step.question } });
     if (sinceCheckpoint + 1 >= CHECKPOINT_EVERY) {
       setSinceCheckpoint(0);
@@ -569,6 +575,25 @@ function Learn({ set }: { set: SetDetail }) {
           </div>
         ) : null}
       </div>
+
+      {feedback && !feedback.correct ? (
+        <ExplainButton
+          key={question.cardId + String(feedback.choice ?? feedback.given ?? '')}
+          className="mt-3"
+          setId={set.id}
+          term={card.termPlain}
+          definition={card.definitionPlain}
+          answerSide={question.answerSide}
+          given={
+            feedback.given ??
+            (question.kind === 'mc' && typeof feedback.choice === 'number'
+              ? (question.options[feedback.choice]?.text ?? '')
+              : question.kind === 'tf'
+                ? `${feedback.choice ? '✓' : '✗'} ${question.shown.text}`
+                : '')
+          }
+        />
+      ) : null}
 
       {feedback ? (
         <div className="mt-4 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
