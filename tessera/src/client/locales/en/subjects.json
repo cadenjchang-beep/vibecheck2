@@ -1,0 +1,15 @@
+{
+  "languages": "Languages",
+  "science": "Science",
+  "math": "Maths",
+  "history": "History",
+  "social-studies": "Social studies",
+  "literature": "Literature",
+  "arts": "Arts",
+  "computer-science": "Computer science",
+  "medicine": "Medicine and health",
+  "business": "Business",
+  "law": "Law",
+  "test-prep": "Test prep and certifications",
+  "other": "Other"
+}

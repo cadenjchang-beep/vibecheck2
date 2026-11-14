@@ -1,0 +1,17 @@
+{
+  "streak": "{count, plural, one {Racha de # día} other {Racha de # días}}",
+  "streakNone": "Aún no tienes racha",
+  "streakHint": "Estudia cualquier tarjeta hoy para empezar una.",
+  "streakKeep": "Estudia hoy para mantenerla.",
+  "streakDone": "Ya estudiaste hoy.",
+  "longest": "Récord: {count, plural, one {# día} other {# días}}",
+  "goalTitle": "Meta de hoy",
+  "goalProgress": "{done} de {goal} tarjetas",
+  "goalMet": "¡Meta cumplida! Muy bien.",
+  "goalOff": "Sin meta diaria",
+  "dueTitle": "Listo para repasar",
+  "dueBody": "{count, plural, one {# tarjeta pendiente} other {# tarjetas pendientes}}",
+  "dueNone": "Nada pendiente por ahora",
+  "starred": "Sets destacados",
+  "browse": "Encuentra sets para estudiar"
+}

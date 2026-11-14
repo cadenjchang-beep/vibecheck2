@@ -1,0 +1,40 @@
+# A self-contained preview: the production build with demo accounts, sample
+# sets, test payments and test AI (or real AI if ANTHROPIC_API_KEY is set).
+# Kept out of search engines. Nothing to configure:
+#
+#   docker compose -f compose.preview.yaml up --build
+#   open http://localhost:4300 and sign in with a demo account
+#
+# `docker compose -f compose.preview.yaml down` throws everything away.
+name: tessera-preview
+
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: tessera
+      POSTGRES_PASSWORD: preview
+      POSTGRES_DB: tessera
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U tessera -d tessera"]
+      interval: 3s
+      timeout: 3s
+      retries: 30
+
+  app:
+    build:
+      context: .
+      args:
+        APP_VERSION: ${APP_VERSION:-preview}
+    environment:
+      APP_ENV: preview
+      DATABASE_URL: postgres://tessera:preview@db:5432/tessera
+      APP_URL: ${PREVIEW_URL:-http://localhost:4300}
+      # Optional: set these in your shell to try the real services.
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET:-}
+    ports:
+      - "${PREVIEW_PORT:-4300}:8787"
+    depends_on:
+      db:
+        condition: service_healthy

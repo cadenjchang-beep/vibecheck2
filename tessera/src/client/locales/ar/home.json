@@ -1,0 +1,17 @@
+{
+  "streak": "{count, plural, zero {لا سلسلة} one {سلسلة يوم واحد} two {سلسلة يومين} few {سلسلة # أيام} many {سلسلة # يومًا} other {سلسلة # يوم}}",
+  "streakNone": "لا توجد سلسلة بعد",
+  "streakHint": "ادرس أي بطاقة اليوم لتبدأ سلسلة.",
+  "streakKeep": "ادرس اليوم لتحافظ عليها.",
+  "streakDone": "لقد درست اليوم.",
+  "longest": "الأطول: {count, plural, zero {لا أيام} one {يوم واحد} two {يومان} few {# أيام} many {# يومًا} other {# يوم}}",
+  "goalTitle": "هدف اليوم",
+  "goalProgress": "{done} من {goal} بطاقة",
+  "goalMet": "حققت هدفك. أحسنت!",
+  "goalOff": "لا هدف يومي",
+  "dueTitle": "جاهزة للمراجعة",
+  "dueBody": "{count, plural, zero {لا بطاقات مستحقة} one {بطاقة واحدة مستحقة} two {بطاقتان مستحقتان} few {# بطاقات مستحقة} many {# بطاقة مستحقة} other {# بطاقة مستحقة}}",
+  "dueNone": "لا شيء مستحق الآن",
+  "starred": "المجموعات المميّزة",
+  "browse": "اعثر على مجموعات للدراسة"
+}
