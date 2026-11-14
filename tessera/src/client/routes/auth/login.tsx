@@ -55,7 +55,7 @@ export default function LogIn() {
       footer={
         <>
           {t('auth.noAccount')}{' '}
-          <Link to={`/signup${params.get('next') ? `?next=${encodeURIComponent(next)}` : ''}`} className="font-semibold text-primary hover:underline">
+          <Link to={`/signup${params.get('next') ? `?next=${encodeURIComponent(next)}` : ''}`} className="tap-target font-semibold text-primary hover:underline">
             {t('auth.signUp')}
           </Link>
         </>
@@ -85,7 +85,7 @@ export default function LogIn() {
         <Button type="submit" size="lg" loading={busy} className="mt-1">
           {t('auth.logIn')}
         </Button>
-        <Link to="/forgot-password" className="self-center font-semibold text-primary hover:underline">
+        <Link to="/forgot-password" className="tap-target self-center font-semibold text-primary hover:underline">
           {t('auth.forgotPassword')}
         </Link>
       </form>

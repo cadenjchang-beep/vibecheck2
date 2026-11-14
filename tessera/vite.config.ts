@@ -1,5 +1,6 @@
 import { createHash } from 'node:crypto';
-import { readdirSync, readFileSync, statSync } from 'node:fs';
+import { readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
+import { brotliCompressSync, constants as zlib, gzipSync } from 'node:zlib';
 import path from 'node:path';
 import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
@@ -40,12 +41,38 @@ function serviceWorker(): Plugin {
 
 const API = process.env.API_URL ?? 'http://localhost:8787';
 
+/**
+ * Writes Brotli and gzip copies next to each text file of the build. The Node
+ * server sends them to browsers that accept them (serveStatic precompressed);
+ * CDNs such as Netlify's compress on their own and ignore the copies.
+ */
+function precompress(): Plugin {
+  return {
+    name: 'tessera-precompress',
+    apply: 'build',
+    closeBundle() {
+      const walk = (dir: string): string[] =>
+        readdirSync(dir).flatMap((name) => {
+          const full = path.join(dir, name);
+          return statSync(full).isDirectory() ? walk(full) : [full];
+        });
+      for (const file of walk('dist/client')) {
+        if (!/\.(js|css|svg|webmanifest|json|txt)$/.test(file)) continue;
+        const data = readFileSync(file);
+        if (data.length < 1024) continue;
+        writeFileSync(`${file}.br`, brotliCompressSync(data, { params: { [zlib.BROTLI_PARAM_QUALITY]: 11 } }));
+        writeFileSync(`${file}.gz`, gzipSync(data, { level: 9 }));
+      }
+    },
+  };
+}
+
 export default defineConfig({
   // The client takes no build-time configuration: everything it needs comes
   // from /api/me. Keeping Vite away from .env also stops a server-side
   // NODE_ENV=development from producing a development build of React.
   envDir: false,
-  plugins: [react(), tailwindcss(), serviceWorker()],
+  plugins: [react(), tailwindcss(), serviceWorker(), precompress()],
   resolve: {
     alias: {
       '@': path.resolve(import.meta.dirname, 'src/client'),

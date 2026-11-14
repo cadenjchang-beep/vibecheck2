@@ -20,7 +20,7 @@ function Section({ title, sets, more }: { title: string; sets: SetSummary[]; mor
       <div className="flex items-baseline justify-between gap-3">
         <h2 className="text-xl font-bold">{title}</h2>
         {more ? (
-          <Link to="/library" className="font-semibold text-primary hover:underline">
+          <Link to="/library" className="tap-target font-semibold text-primary hover:underline">
             {t('sets.homeSeeAll')}
           </Link>
         ) : null}

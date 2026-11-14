@@ -7,7 +7,8 @@ export function Switch({ className, ...props }: ComponentProps<typeof SwitchPrim
   return (
     <SwitchPrimitive.Root
       className={cn(
-        'peer inline-flex h-7 w-12 shrink-0 items-center rounded-full border-2 border-input bg-card transition-colors data-[state=checked]:border-primary data-[state=checked]:bg-primary disabled:opacity-50',
+        // On touch screens an invisible margin makes the hit area finger-sized.
+        'peer relative inline-flex h-7 w-12 shrink-0 items-center rounded-full border-2 border-input bg-card transition-colors data-[state=checked]:border-primary data-[state=checked]:bg-primary disabled:opacity-50 pointer-coarse:after:absolute pointer-coarse:after:-inset-2.5',
         className,
       )}
       {...props}
@@ -110,7 +111,7 @@ export function Segmented<T extends string>({ value, onValueChange, options, cla
           value={option.value}
           className={cn(
             'inline-flex shrink-0 items-center justify-center gap-1.5 rounded-lg px-3 font-semibold text-muted-foreground transition-colors hover:text-foreground data-[state=on]:bg-card data-[state=on]:text-foreground data-[state=on]:shadow-card [&_svg]:size-4',
-            size === 'sm' ? 'h-8 text-sm' : 'h-9 text-[0.95rem]',
+            size === 'sm' ? 'h-8 text-sm pointer-coarse:h-11' : 'h-9 text-[0.95rem] pointer-coarse:h-11',
           )}
         >
           {option.icon}

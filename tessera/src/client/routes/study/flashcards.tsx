@@ -431,6 +431,8 @@ function Flashcards({ set }: { set: SetDetail }) {
         {t('flashcards.showing', { side: sideLabel(visibleSide), text: visibleText })}
       </p>
 
+      {/* Phones held sideways: the card on the left, everything else beside it. */}
+      <div className="flex min-h-0 flex-1 flex-col phone-landscape:grid phone-landscape:grid-cols-[minmax(0,1fr)_minmax(13rem,17rem)] phone-landscape:grid-rows-[auto_1fr_auto] phone-landscape:gap-x-4 phone-landscape:*:col-start-2">
       {track ? (
         <div className="mb-3 flex items-center justify-between gap-2 text-sm font-semibold">
           <span aria-hidden="true" className="rounded-full bg-warning-soft px-3 py-1 text-warning-soft-foreground">
@@ -447,8 +449,8 @@ function Flashcards({ set }: { set: SetDetail }) {
         </div>
       ) : null}
 
-      <div className="relative flex min-h-0 flex-1 flex-col">
-        <div className="flip-scene relative min-h-[46dvh] flex-1 sm:min-h-[26rem]">
+      <div className="relative flex min-h-0 flex-1 flex-col phone-landscape:col-start-1! phone-landscape:row-span-3 phone-landscape:row-start-1">
+        <div className="flip-scene relative min-h-[46dvh] flex-1 sm:min-h-[26rem] phone-landscape:min-h-0!">
           <div
             ref={cardRef}
             role="button"
@@ -497,13 +499,13 @@ function Flashcards({ set }: { set: SetDetail }) {
             ) : null}
           </div>
         </div>
-        <p id="flip-hint" className="mt-3 text-center text-sm text-muted-foreground">
+        <p id="flip-hint" className="mt-3 text-center text-sm text-muted-foreground phone-landscape:hidden">
           {coarsePointer ? t('flashcards.flipHintTouch') : t('flashcards.flipHint')}
         </p>
       </div>
 
       {track ? (
-        <div className="mt-4 grid grid-cols-2 gap-3">
+        <div className="mt-4 grid grid-cols-2 gap-3 phone-landscape:mt-0 phone-landscape:grid-cols-1 phone-landscape:self-end">
           <Button size="lg" variant="secondary" onClick={stillLearning} className="min-w-0 border-warning/60 px-3 text-warning-soft-foreground hover:bg-warning-soft">
             <X aria-hidden="true" />
             <span className="truncate">{t('flashcards.stillLearning')}</span>
@@ -514,7 +516,7 @@ function Flashcards({ set }: { set: SetDetail }) {
           </Button>
         </div>
       ) : (
-        <div className="mt-4 grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-3">
+        <div className="mt-4 grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-3 phone-landscape:mt-0 phone-landscape:self-end">
           <Button size="lg" variant="secondary" onClick={() => go(-1)} disabled={index === 0} aria-label={t('flashcards.previous')} className="min-w-0 px-3">
             <ArrowLeft className="rtl:rotate-180" aria-hidden="true" />
             <span className="hidden sm:inline">{t('common.previous')}</span>
@@ -544,6 +546,7 @@ function Flashcards({ set }: { set: SetDetail }) {
           <Shuffle aria-hidden="true" />
           {t('study.shuffle')}
         </Button>
+      </div>
       </div>
       {options}
     </StudyShell>

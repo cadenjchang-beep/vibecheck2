@@ -81,7 +81,7 @@ export default function SignUp() {
       footer={
         <>
           {t('auth.haveAccount')}{' '}
-          <Link to={`/login${params.get('next') ? `?next=${encodeURIComponent(next)}` : ''}`} className="font-semibold text-primary hover:underline">
+          <Link to={`/login${params.get('next') ? `?next=${encodeURIComponent(next)}` : ''}`} className="tap-target font-semibold text-primary hover:underline">
             {t('auth.logIn')}
           </Link>
         </>

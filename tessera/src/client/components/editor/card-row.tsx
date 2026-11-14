@@ -163,7 +163,7 @@ export const CardRow = memo(function CardRow({
           {...attributes}
           {...listeners}
           aria-label={t('editor.dragHandle', { number })}
-          className="flex size-9 cursor-grab touch-none items-center justify-center rounded-lg text-muted-foreground hover:bg-accent hover:text-foreground active:cursor-grabbing"
+          className="flex size-9 cursor-grab touch-none items-center justify-center rounded-lg text-muted-foreground hover:bg-accent hover:text-foreground active:cursor-grabbing pointer-coarse:size-11"
         >
           <GripVertical className="size-4.5" aria-hidden="true" />
         </button>
@@ -173,7 +173,7 @@ export const CardRow = memo(function CardRow({
         {card.aiGenerated ? (
           <Badge variant="primary">
             <Sparkles aria-hidden="true" />
-            {t('common.aiGenerated')}
+            <span className="max-sm:sr-only">{t('common.aiGenerated')}</span>
           </Badge>
         ) : null}
         <div className="ms-auto flex items-center">

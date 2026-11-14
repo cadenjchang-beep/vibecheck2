@@ -33,7 +33,7 @@ export default function ResetPassword() {
   };
 
   const backLink = (
-    <Link to="/login" className="font-semibold text-primary hover:underline">
+    <Link to="/login" className="tap-target font-semibold text-primary hover:underline">
       {t('auth.backToLogIn')}
     </Link>
   );

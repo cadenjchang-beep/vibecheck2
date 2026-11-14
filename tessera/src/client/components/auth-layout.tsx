@@ -23,7 +23,7 @@ export function AuthLayout({
     <div className="flex min-h-dvh flex-col">
       <SkipLink />
       <header className="container-page flex h-16 items-center">
-        <Link to="/" className="rounded-lg" aria-label={t('common.appName')}>
+        <Link to="/" className="rounded-lg pointer-coarse:py-1" aria-label={t('common.appName')}>
           <Logo />
         </Link>
       </header>

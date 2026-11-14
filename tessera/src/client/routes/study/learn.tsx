@@ -394,14 +394,18 @@ function Learn({ set }: { set: SetDetail }) {
   const tfReveal = feedback && question.kind === 'tf' && !question.isTrue;
 
   return shell(
-    <div className="mx-auto flex w-full max-w-2xl flex-1 flex-col">
+    // Phones held sideways: the question on the left, the answers beside it.
+    <div className="mx-auto flex w-full max-w-2xl flex-1 flex-col phone-landscape:grid phone-landscape:max-w-none phone-landscape:grid-cols-2 phone-landscape:content-start phone-landscape:gap-x-5 phone-landscape:*:col-start-2">
       {engine.refresher && engine.answered === 0 ? (
         <Alert variant="info" className="mb-4">
           {t('learn.refresher')}
         </Alert>
       ) : null}
 
-      <section className="rounded-3xl border border-border bg-card p-5 shadow-card sm:p-7" aria-labelledby="learn-prompt">
+      <section
+        className="rounded-3xl border border-border bg-card p-5 shadow-card sm:p-7 phone-landscape:sticky phone-landscape:top-14 phone-landscape:col-start-1! phone-landscape:row-span-6 phone-landscape:row-start-1 phone-landscape:self-start phone-landscape:p-4"
+        aria-labelledby="learn-prompt"
+      >
         <div className="flex items-start gap-2">
           <p className="flex-1 text-sm font-semibold text-muted-foreground">{question.promptSide === 'term' ? t('study.term') : t('study.definition')}</p>
           {canSpeak() ? (

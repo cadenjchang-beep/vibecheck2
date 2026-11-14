@@ -17,14 +17,14 @@ const buttonVariants = cva(
         link: 'h-auto rounded-md px-0 text-primary underline-offset-4 hover:underline',
       },
       size: {
-        sm: 'h-9 px-3 text-sm',
+        sm: 'h-9 px-3 text-sm pointer-coarse:h-11',
         md: 'h-11 px-4 text-[0.95rem]',
         lg: 'h-13 px-6 text-base',
         icon: 'size-11',
-        'icon-sm': 'size-9',
+        'icon-sm': 'size-9 pointer-coarse:size-11',
       },
     },
-    compoundVariants: [{ variant: 'link', class: 'h-auto px-0' }],
+    compoundVariants: [{ variant: 'link', class: 'h-auto px-0 tap-target' }],
     defaultVariants: { variant: 'primary', size: 'md' },
   },
 );

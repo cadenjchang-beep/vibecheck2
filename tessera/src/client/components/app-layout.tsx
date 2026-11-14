@@ -285,7 +285,7 @@ function Header({ user }: { user: MeUser | null }) {
   return (
     <header className="no-print sticky top-0 z-40 border-b border-border bg-background/90 backdrop-blur-md">
       <div className="container-page flex h-16 items-center gap-2 sm:gap-4">
-        <Link to={user ? '/home' : '/'} className="rounded-lg" aria-label={t('common.appName')}>
+        <Link to={user ? '/home' : '/'} className="rounded-lg pointer-coarse:py-1" aria-label={t('common.appName')}>
           <Logo />
         </Link>
         {user ? (
@@ -415,13 +415,13 @@ export function Footer() {
       <div className="container-page flex flex-col items-center justify-between gap-3 py-6 text-sm text-muted-foreground sm:flex-row">
         <p>{t('nav.footerNote')}</p>
         <nav aria-label={t('nav.footer')} className="flex gap-5">
-          <Link to="/browse" className="hover:text-foreground hover:underline">
+          <Link to="/browse" className="tap-target hover:text-foreground hover:underline">
             {t('nav.browse')}
           </Link>
-          <Link to="/privacy" className="hover:text-foreground hover:underline">
+          <Link to="/privacy" className="tap-target hover:text-foreground hover:underline">
             {t('nav.privacy')}
           </Link>
-          <Link to="/terms" className="hover:text-foreground hover:underline">
+          <Link to="/terms" className="tap-target hover:text-foreground hover:underline">
             {t('nav.terms')}
           </Link>
         </nav>

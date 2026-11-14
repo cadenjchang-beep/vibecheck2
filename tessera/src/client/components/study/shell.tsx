@@ -46,7 +46,7 @@ export function StudyShell({ set, mode, progress, status, onOpenOptions, childre
     <div className="flex min-h-dvh flex-col bg-background">
       <SkipLink />
       <header className="sticky top-0 z-30 bg-background/95 backdrop-blur-md">
-        <div className="mx-auto flex h-14 max-w-4xl items-center gap-2 px-2 sm:px-4">
+        <div className="mx-auto flex h-14 max-w-4xl items-center gap-2 px-2 sm:px-4 phone-landscape:h-11 phone-landscape:max-w-none">
           <Tooltip label={t('study.close')}>
             <Button variant="ghost" size="icon" asChild>
               <Link to={closeTo ?? `/sets/${set.id}`} aria-label={t('study.close')}>
@@ -84,7 +84,7 @@ export function StudyShell({ set, mode, progress, status, onOpenOptions, childre
         </div>
         {progress ? <ProgressBar value={progress.value} label={progress.label} className="h-1.5 rounded-none" /> : <div className="h-px bg-border" />}
       </header>
-      <main id="main" tabIndex={-1} className="mx-auto flex w-full max-w-4xl flex-1 flex-col px-4 py-5 outline-none sm:py-8">
+      <main id="main" tabIndex={-1} className="mx-auto flex w-full max-w-4xl flex-1 flex-col px-4 py-5 outline-none sm:py-8 phone-landscape:max-w-none phone-landscape:py-2">
         {children}
       </main>
     </div>

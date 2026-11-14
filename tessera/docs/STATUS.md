@@ -27,6 +27,8 @@ were run again at the end (see the last section).
 | Docker image, `compose.preview.yaml`, `compose.yaml` with a one-off migration step, `.env.production.example`, `docs/DEPLOYMENT.md` | Image built; preview stack started healthy with demo data and sign-in; production stack migrated, started healthy in production mode, and wrote to its data volume as the unprivileged user |
 | Fix found while deploying: Better Auth could not see client addresses and fell back to one shared rate-limit bucket, so failed logins from one person could throttle everyone | The warning is gone; auth API tests pass |
 | CI workflow (checks, API, browser, container smoke test) and image publishing to GitHub Container Registry on `main` | Validated as YAML and against the same commands run here; it has not run on GitHub yet |
+| Netlify: CDN for the web app, functions for the API and scheduled jobs, Netlify Blobs for uploads, migrations (and preview demo data) at build time, previews isolated on their own database | Netlify's CLI built it offline as a deploy preview; the built function bundles were then called directly: sign-in, sessions, server-rendered set pages, uploads with byte ranges to Netlify's local Blobs server, cross-site blocking, scheduled jobs. Not yet deployed to a real Netlify site |
+| Devices: a two-column study layout for phones held sideways (Flashcards, Learn), finger-sized controls on touch screens only, notch-safe side insets, a wider column on large monitors, and compressed JavaScript and CSS from the Node server (337 KB to 89 KB for the main script) | A device audit of 17 pages on 10 screen shapes (320px phone to 2560px monitor, touch and mouse), screenshots of each shape, and `e2e/devices.spec.ts` as a regression test |
 
 ## Acceptance criteria
 
@@ -86,9 +88,11 @@ implemented but have never run against the real service:
   the Privacy and Terms pages, which are plain-language placeholders.
 - **Sign-up reveals whether an email is registered**, as most consumer apps do.
 - **Match times are reported by the browser** and only sanity-checked.
-- **Initial JavaScript is about 150 kB gzipped.** The 2-second load target on a
-  mid-range phone has not been measured on a real device; repeat visits load
-  from the service worker's cache.
+- **Load time.** On an emulated mid-range phone (4x slower CPU, slow 4G,
+  empty cache) the first meaningful paint is 0.7 s for a public set page and
+  1.8 to 1.9 s for the landing and login pages, inside the 2-second target.
+  Not yet measured on a physical device. Repeat visits load from the service
+  worker's cache.
 - **The name "Tessera" is a working title** with no trademark check.
 
 ## Suggested follow-ups
@@ -109,7 +113,8 @@ implemented but have never run against the real service:
 
 ## Last full run
 
-`npm run check` clean (typecheck, translations, unused code, contrast); 213
-unit and API tests and 71 browser tests (desktop and 375px phone projects),
-all passing; the Docker image builds, and both the preview and production
-compose stacks start healthy.
+`npm run check` clean (typecheck, translations, unused code, contrast); 220
+unit and API tests and 80 browser tests (desktop and 375px phone projects,
+including the device matrix), all passing; the Docker image builds, both
+compose stacks start healthy, and the Netlify build and function bundles were
+checked as described above.

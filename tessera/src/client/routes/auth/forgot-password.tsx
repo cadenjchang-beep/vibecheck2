@@ -37,7 +37,7 @@ export default function ForgotPassword() {
       title={t('auth.forgotTitle')}
       subtitle={sent ? undefined : t('auth.forgotSubtitle')}
       footer={
-        <Link to="/login" className="font-semibold text-primary hover:underline">
+        <Link to="/login" className="tap-target font-semibold text-primary hover:underline">
           {t('auth.backToLogIn')}
         </Link>
       }

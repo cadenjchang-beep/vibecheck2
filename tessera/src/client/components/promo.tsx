@@ -22,7 +22,7 @@ export function PromoSlot({ className }: { className?: string }) {
         <p className="font-semibold">{t('upgrade.promoTitle')}</p>
         <p className="text-sm text-muted-foreground">{t('upgrade.promoBody')}</p>
       </div>
-      <Link to="/upgrade" className="shrink-0 rounded-lg text-sm font-semibold text-primary hover:underline">
+      <Link to="/upgrade" className="tap-target shrink-0 rounded-lg text-sm font-semibold text-primary hover:underline">
         {t('upgrade.promoCta')}
       </Link>
     </aside>

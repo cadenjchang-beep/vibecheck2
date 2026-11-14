@@ -180,7 +180,7 @@ function Header({ set }: { set: SetDetail }) {
           {set.sourceSet ? (
             <p className="mt-2 text-sm text-muted-foreground">
               {t('sets.copiedFrom')}{' '}
-              <Link to={`/sets/${set.sourceSet.id}`} className="font-semibold text-primary hover:underline" dir="auto">
+              <Link to={`/sets/${set.sourceSet.id}`} className="tap-target font-semibold text-primary hover:underline" dir="auto">
                 {set.sourceSet.title}
               </Link>
             </p>
@@ -384,7 +384,7 @@ const TermRow = memo(function TermRow({ card, stage, starred, termLang, definiti
             type="button"
             onClick={() => onHistory?.(card)}
             aria-label={`${t(`stages.${stage}`)}. ${t('stats.historyOpen', { term: card.termPlain })}`}
-            className="-m-2 mt-[-0.125rem] flex size-8 shrink-0 items-center justify-center rounded-lg hover:bg-accent"
+            className="-m-2 mt-[-0.125rem] flex size-8 shrink-0 items-center justify-center rounded-lg hover:bg-accent pointer-coarse:-m-3 pointer-coarse:size-11"
           >
             <StageTile stage={stage} className="size-4" />
           </button>
