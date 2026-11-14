@@ -122,5 +122,50 @@ class S3Storage implements StorageDriver {
   }
 }
 
+/**
+ * Netlify Blobs: object storage built into Netlify, configured automatically
+ * inside Netlify functions. Ranges are served by slicing, since uploads are a
+ * few megabytes at most.
+ */
+class NetlifyBlobsStorage implements StorageDriver {
+  private store: Promise<import('@netlify/blobs').Store> | null = null;
+  private open() {
+    this.store ??= import('@netlify/blobs').then(({ getStore }) => getStore({ name: 'tessera-media', consistency: 'strong' }));
+    return this.store;
+  }
+
+  async put(key: string, data: Uint8Array, contentType: string): Promise<void> {
+    assertSafeKey(key);
+    const copy = new Uint8Array(data);
+    await (await this.open()).set(key, copy.buffer, { metadata: { contentType } });
+  }
+
+  async get(key: string, range?: ByteRange): Promise<StoredObject | null> {
+    assertSafeKey(key);
+    const data = (await (await this.open()).get(key, { type: 'arrayBuffer' })) as ArrayBuffer | null;
+    if (!data) return null;
+    const bytes = new Uint8Array(data);
+    const total = bytes.length;
+    let slice = bytes;
+    let served: { start: number; end: number } | undefined;
+    if (range && total > 0) {
+      const start = Math.min(range.start, total - 1);
+      const end = Math.min(range.end ?? total - 1, total - 1);
+      slice = bytes.subarray(start, end + 1);
+      served = { start, end };
+    }
+    return { body: new Blob([slice]).stream(), size: slice.length, total, range: served };
+  }
+
+  async delete(key: string): Promise<void> {
+    assertSafeKey(key);
+    await (await this.open()).delete(key);
+  }
+}
+
 export const storage: StorageDriver =
-  env.STORAGE_DRIVER === 's3' ? new S3Storage() : new LocalStorage(path.resolve(env.STORAGE_LOCAL_DIR));
+  env.STORAGE_DRIVER === 's3'
+    ? new S3Storage()
+    : env.STORAGE_DRIVER === 'netlify'
+      ? new NetlifyBlobsStorage()
+      : new LocalStorage(path.resolve(env.STORAGE_LOCAL_DIR));

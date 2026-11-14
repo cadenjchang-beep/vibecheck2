@@ -27,7 +27,7 @@ const schema = z.object({
   SMTP_URL: optional,
   EMAIL_FROM: z.string().default('Tessera <no-reply@localhost>'),
 
-  STORAGE_DRIVER: z.enum(['local', 's3']).default('local'),
+  STORAGE_DRIVER: z.enum(['local', 's3', 'netlify']).default('local'),
   STORAGE_LOCAL_DIR: z.string().default('.data/uploads'),
   S3_BUCKET: optional,
   S3_REGION: z.string().default('auto'),
@@ -65,6 +65,12 @@ const schema = z.object({
   SEED_DEMO: optional,
   /** Build identifier reported by /api/health, such as a commit hash. */
   APP_VERSION: optional,
+  /** Database connections per server instance. Keep it small on serverless hosts. */
+  DATABASE_POOL_MAX: z.coerce.number().int().min(1).max(100).default(10),
+  /** How long one AI request may take. Serverless hosts cut requests off sooner. */
+  AI_TIMEOUT_SECONDS: z.coerce.number().int().min(5).max(600).default(180),
+  /** Thinking effort for card generation: lower is faster. */
+  AI_GENERATE_EFFORT: z.enum(['low', 'medium', 'high']).default('medium'),
 });
 
 export type AppEnvironment = 'development' | 'preview' | 'production';
@@ -155,7 +161,8 @@ export function parseEnv(source: Record<string, string | undefined>) {
     seedDemo,
     version: e.APP_VERSION ?? 'dev',
     warnings,
-    appUrl: e.APP_URL.replace(/\/+$/, ''),
+    // Only the origin: a path here would move every route, sign-in included.
+    appUrl: new URL(e.APP_URL).origin,
     authSecret,
     emailTransport,
     aiProvider: aiProvider as 'anthropic' | 'mock' | 'off',

@@ -15,6 +15,7 @@
     "isolatedModules": true,
     "verbatimModuleSyntax": true,
     "resolveJsonModule": true,
+    "allowArbitraryExtensions": true,
     "types": ["node", "vite/client"],
     "paths": {
       "@/*": ["./src/client/*"],
@@ -22,5 +23,5 @@
       "@server/*": ["./src/server/*"]
     }
   },
-  "include": ["src", "e2e", "tests", "scripts", "*.ts"]
+  "include": ["src", "e2e", "tests", "scripts", "netlify", "*.ts"]
 }

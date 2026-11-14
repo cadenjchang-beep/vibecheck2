@@ -20,6 +20,10 @@ Then open http://localhost:4300 and pick a demo account on the login page.
 The preview needs no keys: AI and payments run in test mode, and it is kept
 out of search engines.
 
+To host it on **Netlify**, follow [`docs/DEPLOYMENT.md#netlify`](docs/DEPLOYMENT.md#netlify):
+set the base directory to `tessera`, connect a database, and deploy. Pull
+requests then get their own preview deploys with demo data.
+
 This app lives in its own `tessera/` directory. The Golf Journal app at the
 repository root is separate and untouched.
 

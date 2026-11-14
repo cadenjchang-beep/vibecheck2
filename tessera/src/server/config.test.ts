@@ -24,6 +24,10 @@ describe('deployment modes', () => {
     expect(() => parseEnv({ ...base, APP_ENV: 'production' })).toThrow(/NODE_ENV=production/);
   });
 
+  it('reduces APP_URL to its origin', () => {
+    expect(parseEnv({ ...base, APP_URL: 'https://tessera.example/app/' }).appUrl).toBe('https://tessera.example');
+  });
+
   it('warns when production is served without HTTPS', () => {
     const env = parseEnv({ ...base, APP_URL: 'http://tessera.example', NODE_ENV: 'production', BETTER_AUTH_SECRET: secret });
     expect(env.warnings.join(' ')).toMatch(/not https/);

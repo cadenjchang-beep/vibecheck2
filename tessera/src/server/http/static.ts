@@ -18,13 +18,32 @@ function readIndexHtml(): string | null {
  * (the HTML shell, service worker, manifest) is revalidated on each request so
  * a deploy reaches users immediately.
  */
+export interface ClientOptions {
+  /** The built index.html; read from dist/client when not given. */
+  indexHtml?: string | null;
+  /**
+   * Serve the built files too. Off where a CDN serves them (Netlify), and the
+   * server only renders HTML for the routes sent to it.
+   */
+  serveFiles?: boolean;
+}
+
 export function mountClient(
   app: Hono<AppEnv>,
   renderPage: (c: Ctx, indexHtml: string) => Promise<{ html: string; status: 200 | 404 }>,
+  options: ClientOptions = {},
 ): void {
-  const indexHtml = readIndexHtml();
+  const indexHtml = options.indexHtml ?? readIndexHtml();
   if (!indexHtml) {
     log.warn('dist/client not found: serving the API only (run `npm run build` to serve the web app)');
+    return;
+  }
+  if (options.serveFiles === false) {
+    app.get('*', async (c) => {
+      const page = await renderPage(c, indexHtml);
+      c.header('cache-control', 'private, no-cache');
+      return c.html(page.html, page.status);
+    });
     return;
   }
 

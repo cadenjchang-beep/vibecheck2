@@ -1,0 +1,61 @@
+# Netlify configuration. In the Netlify site settings, set the base directory
+# to `tessera` (this file's folder). See docs/DEPLOYMENT.md#netlify.
+#
+# Production deploys run in production mode; deploy previews and branch
+# deploys run in preview mode with demo data (src/server/platform/netlify.ts).
+
+[build]
+  # Relative to the repository root; matches the base directory in the site settings.
+  base = "tessera"
+  command = "npm run netlify:build"
+  publish = "dist/client"
+
+[build.environment]
+  NODE_VERSION = "22"
+
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "esbuild"
+
+# The service worker's offline copy of the app shell.
+[[redirects]]
+  from = "/shell"
+  to = "/index.html"
+  status = 200
+
+# Every other route belongs to the single-page app. The API and public set
+# pages are handled first by the function's own routes (netlify/functions/api.mts).
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Content-Security-Policy = "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' blob:; font-src 'self'; connect-src 'self'; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'"
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=()"
+    Strict-Transport-Security = "max-age=31536000; includeSubDomains"
+
+# Content-hashed build output never changes.
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# Always revalidated, so each deploy reaches people straight away.
+[[headers]]
+  for = "/sw.js"
+  [headers.values]
+    Cache-Control = "no-cache"
+[[headers]]
+  for = "/index.html"
+  [headers.values]
+    Cache-Control = "no-cache"
+[[headers]]
+  for = "/manifest.webmanifest"
+  [headers.values]
+    Cache-Control = "no-cache"

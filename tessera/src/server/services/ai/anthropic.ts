@@ -23,7 +23,9 @@ type Content = Anthropic.Beta.BetaContentBlockParam[];
 
 let client: Anthropic | null = null;
 function getClient(): Anthropic {
-  client ??= new Anthropic({ apiKey: env.ANTHROPIC_API_KEY, maxRetries: 2, timeout: 180_000 });
+  // With a short time budget (serverless hosts), a retry would only run out the clock.
+  const timeout = env.AI_TIMEOUT_SECONDS * 1000;
+  client ??= new Anthropic({ apiKey: env.ANTHROPIC_API_KEY, maxRetries: timeout < 60_000 ? 0 : 2, timeout });
   return client;
 }
 
@@ -128,7 +130,7 @@ export const anthropicProvider: AiProvider = {
       content.push({ type: 'text', text: `Write flashcards from these notes:\n<material>\n${escapeTags(source.text)}\n</material>` });
     }
 
-    const { data, usage } = await run('generate', { system, content, schema: generateSchema, effort: 'medium', maxTokens: 16_000 });
+    const { data, usage } = await run('generate', { system, content, schema: generateSchema, effort: env.AI_GENERATE_EFFORT, maxTokens: 16_000 });
     return { title: data.title.trim() || null, cards: data.cards, usage };
   },
 

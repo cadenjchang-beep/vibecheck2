@@ -196,6 +196,9 @@ export function parseWith<T>(schema: ZodType<T>, value: unknown): T {
 
 /** Best-effort client address for rate limits when there is no signed-in user. */
 export function clientIp(c: Ctx): string {
+  // Netlify functions: the platform's own record of the caller.
+  const platform = (c.env as { context?: { ip?: string } } | undefined)?.context?.ip;
+  if (platform) return platform;
   if (env.TRUST_PROXY) {
     const forwarded = c.req.header('x-forwarded-for')?.split(',')[0]?.trim();
     if (forwarded) return forwarded;

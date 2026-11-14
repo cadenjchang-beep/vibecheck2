@@ -1,8 +1,30 @@
 {
   "$schema": "https://unpkg.com/knip@6/schema.json",
-  "entry": ["src/client/sw.js", "scripts/*.mjs"],
-  "project": ["src/**/*.{ts,tsx,js,css}", "scripts/**/*.mjs", "tests/**/*.ts", "e2e/**/*.ts"],
-  "ignoreDependencies": ["pino-pretty"],
+  "entry": [
+    "src/client/sw.js",
+    "scripts/*.mjs",
+    "scripts/*.ts",
+    "netlify/functions/*.mts"
+  ],
+  "project": [
+    "src/**/*.{ts,tsx,js,css}",
+    "scripts/**/*.{mjs,ts}",
+    "tests/**/*.ts",
+    "e2e/**/*.ts",
+    "netlify/**/*.{ts,mts}"
+  ],
+  "ignoreDependencies": [
+    "pino-pretty"
+  ],
   "ignoreExportsUsedInFile": true,
-  "include": ["files", "exports", "dependencies", "unlisted", "unresolved"]
+  "include": [
+    "files",
+    "exports",
+    "dependencies",
+    "unlisted",
+    "unresolved"
+  ],
+  "ignore": [
+    "netlify/generated/**"
+  ]
 }

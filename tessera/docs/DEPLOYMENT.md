@@ -122,6 +122,69 @@ Cloud Run, AWS ECS, Azure Container Apps, Kubernetes). Use the image from the
 - attach a managed PostgreSQL database, and S3-compatible storage for uploads
   if instances do not share a persistent disk.
 
+## Netlify
+
+Netlify serves the built web app from its CDN and runs the server as
+functions (`netlify/functions/`): `api` handles the API, sign-in, public set
+pages, `robots.txt` and the sitemap; `jobs` sends reminders and cleans up
+every ten minutes. `netlify.toml` holds the build command, routes, security
+headers and caching rules.
+
+### Set up
+
+1. In Netlify, **Add new site → Import an existing project**, choose this
+   repository, and set the **base directory** to `tessera`. The build command
+   and publish directory come from `netlify.toml`.
+2. **Database for production.** Either add Netlify DB from the `tessera`
+   folder with `npx netlify db init` (it sets `NETLIFY_DATABASE_URL`), or set
+   `DATABASE_URL` to any PostgreSQL 14+ database (Neon, Supabase, …). Use the
+   provider's *pooled* connection string.
+3. **Database for previews.** Set `PREVIEW_DATABASE_URL` to a second, separate
+   database. Deploy previews and branch deploys only ever use this one: they
+   load demo accounts, accept test payments and run migrations from unmerged
+   branches, so they must never touch production data. Without it, preview
+   builds stop with a message saying so.
+4. **Environment variables** (Site configuration → Environment variables,
+   available to *Builds* and *Functions*):
+   - `BETTER_AUTH_SECRET`, at least 32 characters (`openssl rand -base64 32`).
+     Required for production; previews get one generated per build.
+   - `SMTP_URL` and `EMAIL_FROM`, so verification and password-reset emails
+     are delivered.
+   - `APP_URL` only for a custom domain; otherwise the Netlify address is used.
+   - Optional services, each hidden until configured: `ANTHROPIC_API_KEY`;
+     `STRIPE_SECRET_KEY`, `STRIPE_PRICE_ID`, `STRIPE_WEBHOOK_SECRET` (webhook
+     URL `https://<your site>/api/billing/webhook`); `GOOGLE_CLIENT_ID` and
+     `GOOGLE_CLIENT_SECRET` (redirect URI
+     `https://<your site>/api/auth/callback/google`); `VAPID_*` for push.
+5. **Deploy.** Every build migrates its database first; preview builds also
+   load the demo data. Production deploys run in production mode; deploy
+   previews and branch deploys run in preview mode, with the banner and demo
+   sign-in. Check a deploy at `https://<your site>/api/health`.
+
+### What is different on Netlify
+
+| | Netlify | Docker / Node server |
+| --- | --- | --- |
+| Uploaded images and audio | Netlify Blobs (built in), or S3 if `S3_BUCKET` is set | local volume or S3 |
+| Reminders and clean-up | scheduled function every 10 minutes | in-process timer or the cron endpoint |
+| Time per request | 30 seconds | no limit |
+| AI card generation | lower effort and a 25-second budget, so it answers in time; very long notes or PDFs may still time out | full effort |
+| Upload size | Netlify functions take request bodies of about 6 MB, so audio files close to the 10 MB limit fail | 10 MB audio, 5 MB images |
+| Database connections | 3 per function instance (`DATABASE_POOL_MAX`) | 10 |
+
+If AI generation from long documents matters to you, the Docker deployment
+has none of these limits. Any setting in the table can be overridden with the
+environment variable named in `src/server/platform/netlify.ts`.
+
+### Building it locally
+
+Netlify's CLI runs the same build: from `tessera`, with a scratch database in
+`PREVIEW_DATABASE_URL`,
+
+```bash
+npx netlify-cli build --offline --context deploy-preview
+```
+
 ## Continuous integration and the published image
 
 `.github/workflows/tessera.yml` (at the repository root) runs on pull requests

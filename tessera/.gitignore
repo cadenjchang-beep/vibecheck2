@@ -10,3 +10,6 @@ playwright-report/
 coverage/
 *.log
 .DS_Store
+# Netlify
+.netlify/
+netlify/generated/deploy.json

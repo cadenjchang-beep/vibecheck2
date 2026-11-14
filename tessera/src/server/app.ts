@@ -9,7 +9,7 @@ import { HttpError } from './http/errors';
 import { clientIp, originGuard, parseJson, requestContext, sessionMiddleware, type AppEnv } from './http/context';
 import { reportError } from './log';
 import { mountSeoRoutes, renderPage } from './http/pages';
-import { mountClient } from './http/static';
+import { mountClient, type ClientOptions } from './http/static';
 import { folderRoutes, internalRoutes, pushRoutes, searchRoutes, setFolderRoutes, statsRoutes } from './routes/library';
 import { consentRoutes, meRoutes } from './routes/me';
 import { aiRoutes } from './routes/ai';
@@ -26,7 +26,7 @@ import { compress } from 'hono/compress';
 
 const MB = 1024 * 1024;
 
-export function createApp() {
+export function createApp(options: { client?: ClientOptions } = {}) {
   const app = new Hono<AppEnv>();
 
   app.use(requestContext);
@@ -120,7 +120,7 @@ app.route('/api/internal', internalRoutes);
   app.all('/api/*', (c) => c.json<ApiErrorBody>({ error: { code: 'not_found', message: 'Not found.' } }, 404));
 
   mountSeoRoutes(app);
-  mountClient(app, renderPage);
+  mountClient(app, renderPage, options.client);
 
   app.onError((err, c) => {
     if (err instanceof HttpError) {
