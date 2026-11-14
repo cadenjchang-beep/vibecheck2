@@ -6,7 +6,6 @@
   "stats": "Estadísticas",
   "search": "Buscar",
   "browse": "Explorar",
-  "folders": "Carpetas",
   "classes": "Clases",
   "settings": "Ajustes",
   "upgrade": "Pásate a Premium",
@@ -23,5 +22,6 @@
   "dueBadge": "{count, plural, one {# tarjeta pendiente} other {# tarjetas pendientes}}",
   "privacy": "Privacidad",
   "terms": "Términos",
-  "footerNote": "Sin anuncios de terceros. Nunca vendemos tus datos."
+  "footerNote": "Sin anuncios de terceros. Nunca vendemos tus datos.",
+  "footer": "Enlaces del sitio"
 }

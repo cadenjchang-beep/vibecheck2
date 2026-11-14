@@ -18,6 +18,16 @@ were run again at the end (see the last section).
 | 8 | Manifest, icons, service worker (offline study, push), premium offline downloads, accessibility audit, right-to-left check, Spanish and Arabic catalogues for the app shell | Browser tests: offline study, axe audit of 22 pages in light and dark, 375px sweep of 27 pages in LTR and RTL |
 | 9 | Stripe checkout, portal and webhooks; test provider; upgrade page; plan, password, data export and account deletion in Settings; promotion slot for the free plan; Dockerfile; documentation | API and browser tests with the test provider |
 
+### After the nine phases
+
+| What | How it was verified |
+| --- | --- |
+| Clean-up: dead code and an unused component removed, feature flags from the phased build removed, 66 unused translation strings removed, a circular import untangled. `npm run check` (typecheck, translations, unused code via knip, contrast) keeps it that way | The checks themselves, plus the full test suites |
+| Deployment modes (`APP_ENV`): preview (demo data, test providers, banner and demo sign-in, kept out of search engines, live payment keys refused) and production (test providers, demo data and a missing secret refused) | Unit tests of the rules in `config.test.ts`; both compose stacks built and run in Docker |
+| Docker image, `compose.preview.yaml`, `compose.yaml` with a one-off migration step, `.env.production.example`, `docs/DEPLOYMENT.md` | Image built; preview stack started healthy with demo data and sign-in; production stack migrated, started healthy in production mode, and wrote to its data volume as the unprivileged user |
+| Fix found while deploying: Better Auth could not see client addresses and fell back to one shared rate-limit bucket, so failed logins from one person could throttle everyone | The warning is gone; auth API tests pass |
+| CI workflow (checks, API, browser, container smoke test) and image publishing to GitHub Container Registry on `main` | Validated as YAML and against the same commands run here; it has not run on GitHub yet |
+
 ## Acceptance criteria
 
 | Criterion | Status |
@@ -43,8 +53,8 @@ implemented but have never run against the real service:
 - **Google sign-in, SMTP delivery, S3 storage and web push delivery.** Tests
   use the file outbox and local disk; push subscription and the service
   worker's push handler are written but no push has been delivered.
-- **The Docker image** has not been built here (no Docker available). Its
-  runtime dependencies were checked against the built server.
+- **The CI workflow** has not run on GitHub yet: it runs on the first pull
+  request or push to `main` that touches `tessera/`.
 
 ## Simplifications and decisions worth knowing
 
@@ -99,6 +109,7 @@ implemented but have never run against the real service:
 
 ## Last full run
 
-Typecheck clean; 206 unit and API tests and 71 browser tests (desktop and
-375px phone projects), all passing; the production build starts and serves
-the app.
+`npm run check` clean (typecheck, translations, unused code, contrast); 213
+unit and API tests and 71 browser tests (desktop and 375px phone projects),
+all passing; the Docker image builds, and both the preview and production
+compose stacks start healthy.

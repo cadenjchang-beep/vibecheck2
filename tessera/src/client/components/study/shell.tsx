@@ -139,7 +139,7 @@ export function StudyGate({ mode, minCards, children }: StudyGateProps) {
 }
 
 /** Shown at the end of a session to visitors, whose progress is not kept. */
-export function GuestNote({ setId }: { setId: string }) {
+function GuestNote({ setId }: { setId: string }) {
   const { t } = useI18n();
   const user = useUser();
   if (isActive(user)) return null;

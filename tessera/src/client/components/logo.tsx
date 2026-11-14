@@ -1,7 +1,7 @@
 import { cn } from '@/lib/utils';
 
 /** The Tessera mark: four mosaic tiles, the last one being set into place. */
-export function LogoMark({ className }: { className?: string }) {
+function LogoMark({ className }: { className?: string }) {
   return (
     <svg viewBox="0 0 32 32" className={cn('size-8', className)} aria-hidden="true" focusable="false">
       <rect x="2" y="2" width="12.5" height="12.5" rx="3.4" className="fill-primary" />

@@ -14,7 +14,7 @@
  * nothing in it that can execute.
  */
 
-export const RICH_TAGS = ['b', 'i', 'u', 's', 'sub', 'sup', 'mark', 'code'] as const;
+const RICH_TAGS = ['b', 'i', 'u', 's', 'sub', 'sup', 'mark', 'code'] as const;
 export type RichTag = (typeof RICH_TAGS)[number];
 
 export type RichNode =
@@ -71,7 +71,7 @@ const NAMED_ENTITIES: Record<string, string> = {
   nbsp: ' ',
 };
 
-export function decodeEntities(text: string): string {
+function decodeEntities(text: string): string {
   if (!text.includes('&')) return text;
   return text.replace(/&(#x[0-9a-f]{1,6}|#\d{1,7}|[a-z]{2,8});/gi, (match, body: string) => {
     if (body[0] === '#') {
@@ -83,7 +83,7 @@ export function decodeEntities(text: string): string {
   });
 }
 
-export function escapeText(text: string): string {
+function escapeText(text: string): string {
   return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
@@ -195,7 +195,7 @@ function tidy(nodes: RichNode[], top = true): RichNode[] {
   return out;
 }
 
-export function serializeRich(nodes: RichNode[]): string {
+function serializeRich(nodes: RichNode[]): string {
   let out = '';
   for (const node of nodes) {
     if (node.type === 'text') out += escapeText(node.text);

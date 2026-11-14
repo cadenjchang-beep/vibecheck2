@@ -9,7 +9,6 @@
   "goalProgress": "{done} de {goal} tarjetas",
   "goalMet": "¡Meta cumplida! Muy bien.",
   "goalOff": "Sin meta diaria",
-  "goalSet": "Fijar una meta",
   "dueTitle": "Listo para repasar",
   "dueBody": "{count, plural, one {# tarjeta pendiente} other {# tarjetas pendientes}}",
   "dueNone": "Nada pendiente por ahora",

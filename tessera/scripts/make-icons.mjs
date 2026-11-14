@@ -1,6 +1,6 @@
 // Renders the app icons and the Open Graph image from SVG with the bundled
 // Chromium. Run after changing the mark: node scripts/make-icons.mjs
-import { chromium } from 'playwright';
+import { chromium } from '@playwright/test';
 import { writeFile } from 'node:fs/promises';
 
 const PRIMARY = '#811e5f';

@@ -34,8 +34,5 @@
   "forgot": "Forgot",
   "nothingDueTitle": "Nothing to review right now",
   "nothingDueSet": "No cards in this set are due. Your next review is {when}.",
-  "nothingDueNever": "Study this set first, or start with some new cards.",
-  "learnNew": "{count, plural, one {Learn # new card} other {Learn # new cards}}",
-  "keysShow": "Show answer",
-  "keysRate": "Rate your recall"
+  "nothingDueNever": "Study this set first, or start with some new cards."
 }

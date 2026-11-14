@@ -1,5 +1,4 @@
 {
-  "flip": "Flip card",
   "flipHint": "Click the card or press Space to flip",
   "flipHintTouch": "Tap the card to flip. Swipe right if you know it, left if not.",
   "showing": "{side}: {text}",

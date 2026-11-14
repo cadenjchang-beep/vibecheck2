@@ -12,7 +12,6 @@ import { generateFromFile, generateFromText, isQuotaError, useAiUsage, useRecord
 import { useI18n } from '@/lib/i18n';
 import { useEntitlements, useErrorMessage, useFeatures, useUser } from '@/lib/me';
 import { entitlementsFor } from '@shared/entitlements';
-import { BUILT } from '@/lib/built';
 
 interface GenerateDialogProps {
   open: boolean;
@@ -276,7 +275,7 @@ function GenerateFlow({ onOpenChange, termLang, definitionLang, room, onAdd }: G
           <Alert variant="error" title={error.quota ? t('ai.quotaTitle') : undefined}>
             {error.message}
             {error.quota && usage.data ? ` ${t('ai.quotaBody', { date: formatDate(usage.data.resetsAt, { dateStyle: 'long' }) })}` : null}
-            {error.quota && entitlements.plan === 'free' && BUILT.upgrade ? (
+            {error.quota && entitlements.plan === 'free' ? (
               <>
                 {' '}
                 <Link to="/upgrade" className="font-semibold underline">

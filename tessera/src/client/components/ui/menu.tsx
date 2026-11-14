@@ -5,7 +5,6 @@ import { cn } from '@/lib/utils';
 
 export const Menu = Primitive.Root;
 export const MenuTrigger = Primitive.Trigger;
-export const MenuGroup = Primitive.Group;
 
 export function MenuContent({ className, sideOffset = 6, align = 'end', ...props }: ComponentProps<typeof Primitive.Content>) {
   return (

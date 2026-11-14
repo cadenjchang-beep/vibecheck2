@@ -2,6 +2,7 @@ import { useState, type FormEvent } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router';
 import { PasswordInput } from '@/components/account-fields';
 import { AuthLayout } from '@/components/auth-layout';
+import { DemoAccounts } from '@/components/demo-accounts';
 import { GoogleButton } from '@/components/google-button';
 import { Button } from '@/components/ui/button';
 import { Alert } from '@/components/ui/feedback';
@@ -25,15 +26,10 @@ export default function LogIn() {
   const [error, setError] = useState(params.get('error') ? t('errors.generic') : '');
   const [busy, setBusy] = useState(false);
 
-  const submit = async (e: FormEvent) => {
-    e.preventDefault();
-    if (!email.trim() || !password) {
-      setError(t('errors.invalid_email_or_password'));
-      return;
-    }
+  const signIn = async (address: string, secret: string) => {
     setBusy(true);
     setError('');
-    const result = await authClient.signIn.email({ email: email.trim(), password });
+    const result = await authClient.signIn.email({ email: address.trim(), password: secret });
     if (result.error) {
       setBusy(false);
       setError(tMaybe(`errors.${authErrorCode(result.error)}`) ?? t('errors.invalid_email_or_password'));
@@ -41,6 +37,15 @@ export default function LogIn() {
     }
     await refreshMe();
     navigate(next, { replace: true });
+  };
+
+  const submit = (e: FormEvent) => {
+    e.preventDefault();
+    if (!email.trim() || !password) {
+      setError(t('errors.invalid_email_or_password'));
+      return;
+    }
+    void signIn(email, password);
   };
 
   return (
@@ -56,6 +61,7 @@ export default function LogIn() {
         </>
       }
     >
+      <DemoAccounts busy={busy} onPick={(address, secret) => void signIn(address, secret)} />
       {features?.googleAuth ? <GoogleButton next={next} /> : null}
       <form onSubmit={submit} noValidate className="flex flex-col gap-4">
         {error ? <Alert variant="error">{error}</Alert> : null}

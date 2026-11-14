@@ -1,0 +1,146 @@
+# Continuous integration and image publishing for the Tessera app (tessera/).
+# Runs on pull requests and on pushes to main that touch the app. Pushes to
+# main also publish a container image to GitHub Container Registry.
+name: Tessera
+
+on:
+  pull_request:
+    paths: ["tessera/**", ".github/workflows/tessera.yml"]
+  push:
+    branches: [main]
+    paths: ["tessera/**", ".github/workflows/tessera.yml"]
+  workflow_dispatch:
+
+concurrency:
+  group: tessera-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    working-directory: tessera
+
+jobs:
+  checks:
+    name: Checks and unit tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: tessera/package-lock.json
+      - run: npm ci
+      # Typecheck, translation catalogues, unused code, colour contrast.
+      - run: npm run check
+      - run: npm run test:unit
+
+  api:
+    name: API tests
+    needs: checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: tessera
+          POSTGRES_PASSWORD: tessera
+          POSTGRES_DB: tessera
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U tessera" --health-interval 5s --health-timeout 5s --health-retries 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: tessera/package-lock.json
+      - run: npm ci
+      - run: npm run test:api
+        env:
+          TEST_DATABASE_URL: postgres://tessera:tessera@127.0.0.1:5432/tessera_vitest
+
+  e2e:
+    name: Browser tests
+    needs: checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: tessera
+          POSTGRES_PASSWORD: tessera
+          POSTGRES_DB: tessera_test
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U tessera" --health-interval 5s --health-timeout 5s --health-retries 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: tessera/package-lock.json
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:e2e -- --trace off
+        env:
+          E2E_DATABASE_URL: postgres://tessera:tessera@127.0.0.1:5432/tessera_test
+      - if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-results
+          path: tessera/test-results
+          retention-days: 7
+
+  preview-smoke:
+    name: Container preview smoke test
+    needs: checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      # Builds the image and starts the self-contained preview stack, then
+      # checks it migrated, loaded the demo data and is in preview mode.
+      - run: docker compose -f compose.preview.yaml up -d --build --wait --wait-timeout 180
+        env:
+          APP_VERSION: ${{ github.sha }}
+      - run: |
+          curl -fsS http://localhost:4300/api/health | tee health.json
+          grep -q '"mode":"preview"' health.json
+          curl -fsS http://localhost:4300/robots.txt | grep -q 'Disallow: /'
+          curl -fsS -o /dev/null http://localhost:4300/login
+      - if: always()
+        run: docker compose -f compose.preview.yaml logs app | tail -100
+      - if: always()
+        run: docker compose -f compose.preview.yaml down -v
+
+  publish:
+    name: Publish image
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: [api, e2e, preview-smoke]
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build and push
+        run: |
+          image="ghcr.io/${GITHUB_REPOSITORY,,}/tessera"
+          docker build --build-arg APP_VERSION="${GITHUB_SHA::12}" -t "$image:${GITHUB_SHA::12}" -t "$image:latest" .
+          docker push "$image:${GITHUB_SHA::12}"
+          docker push "$image:latest"

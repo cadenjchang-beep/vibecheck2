@@ -29,7 +29,6 @@
   "back": "Back",
   "addCards": "{count, plural, one {Add # card} other {Add # cards}}",
   "added": "{count, plural, one {# AI card added. Check it before you study.} other {# AI cards added. Check them before you study.}}",
-  "titleSuggested": "Title suggested by AI",
   "usageLeft": "{left, plural, one {# AI request left this month} other {# AI requests left this month}}",
   "usageResets": "Resets {date}.",
   "mockNote": "Sample output: this server uses a test AI, not a real model.",
@@ -52,6 +51,5 @@
   "distractorsDone": "Multiple-choice questions in this set now use AI-written wrong answers.",
   "distractorsNone": "Every card already has AI-written wrong answers.",
   "distractorsPartial": "{count, plural, one {# card still needs wrong answers. Run it again to finish.} other {# cards still need wrong answers. Run it again to finish.}}",
-  "unavailable": "AI features aren't available right now.",
   "needsVerify": "Confirm your email address to use AI features. We sent you a link when you signed up."
 }

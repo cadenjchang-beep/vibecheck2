@@ -2,7 +2,6 @@ import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { ArrowDown, ArrowUp, GripVertical, ImagePlus, LoaderCircle, Mic, Sparkles, Trash2, X } from 'lucide-react';
 import { memo, useRef, useState, type KeyboardEvent } from 'react';
-import { Link } from 'react-router';
 import { toast } from 'sonner';
 import type { AiSuggestKind } from '@shared/ai';
 import { SuggestMenu } from '@/components/ai/suggest-menu';
@@ -10,7 +9,6 @@ import { RichEditor } from '@/components/rich-editor';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Tooltip } from '@/components/ui/controls';
-import { BUILT } from '@/lib/built';
 import { useI18n } from '@/lib/i18n';
 import { useEntitlements, useErrorMessage } from '@/lib/me';
 import { MEDIA_ACCEPT, uploadMedia } from '@/lib/media';
@@ -39,7 +37,7 @@ function MediaControls({ card, side, onChange }: MediaControlsProps) {
   const pick = (kind: 'image' | 'audio') => {
     const entitled = kind === 'image' ? entitlements.imageUploads : entitlements.audioUploads;
     if (!entitled) {
-      toast(t('editor.mediaPremium'), BUILT.upgrade ? { action: { label: t('nav.upgrade'), onClick: () => window.location.assign('/upgrade') } } : undefined);
+      toast(t('editor.mediaPremium'), { action: { label: t('nav.upgrade'), onClick: () => window.location.assign('/upgrade') } });
       return;
     }
     (kind === 'image' ? imageInput : audioInput).current?.click();
@@ -218,15 +216,3 @@ export const CardRow = memo(function CardRow({
     </li>
   );
 });
-
-export function UpgradeHint() {
-  const { t } = useI18n();
-  return (
-    <p className="text-sm text-muted-foreground">
-      {t('editor.mediaPremium')}{' '}
-      <Link to="/upgrade" className="font-semibold text-primary hover:underline">
-        {t('nav.upgrade')}
-      </Link>
-    </p>
-  );
-}

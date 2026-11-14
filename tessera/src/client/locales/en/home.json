@@ -9,7 +9,6 @@
   "goalProgress": "{done} of {goal} cards",
   "goalMet": "Goal reached. Nicely done!",
   "goalOff": "No daily goal set",
-  "goalSet": "Set a goal",
   "dueTitle": "Ready for review",
   "dueBody": "{count, plural, one {# card is due} other {# cards are due}}",
   "dueNone": "Nothing due right now",

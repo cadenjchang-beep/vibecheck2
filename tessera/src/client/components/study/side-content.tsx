@@ -27,5 +27,3 @@ export function SideContent({
     </>
   );
 }
-
-export const plainOf = (card: CardDto, side: Side) => (side === 'term' ? card.termPlain : card.definitionPlain);

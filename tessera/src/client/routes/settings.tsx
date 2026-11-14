@@ -1,9 +1,10 @@
 import { useQueryClient } from '@tanstack/react-query';
-import { useState, type ReactNode } from 'react';
+import { useState } from 'react';
 import { toast } from 'sonner';
 import type { MeUser } from '@shared/api';
 import { DAILY_GOAL_OPTIONS, UI_LOCALES, type ReminderChannel, type UiLocale } from '@shared/constants';
 import { AccountSection } from '@/components/settings/account';
+import { SettingsCard } from '@/components/settings/card';
 import { Button } from '@/components/ui/button';
 import { Segmented, Switch, ToggleRow } from '@/components/ui/controls';
 import { Alert, PageLoading } from '@/components/ui/feedback';
@@ -15,15 +16,6 @@ import { usePageTitle } from '@/lib/page';
 import { subscribeToPush } from '@/lib/push';
 import { keys } from '@/lib/query';
 import { useTheme, type ThemeChoice } from '@/lib/theme';
-
-export function SettingsCard({ title, children }: { title: string; children: ReactNode }) {
-  return (
-    <section className="rounded-2xl border border-border bg-card p-5 shadow-card sm:p-6">
-      <h2 className="text-xl font-bold">{title}</h2>
-      <div className="mt-4 flex flex-col gap-4">{children}</div>
-    </section>
-  );
-}
 
 function SettingsForm({ user }: { user: MeUser }) {
   const { t, locale, setLocale, formatDate } = useI18n();

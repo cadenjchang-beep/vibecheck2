@@ -31,11 +31,6 @@ export function shuffle<T>(items: readonly T[], rng: Rng): T[] {
   return out;
 }
 
-/** Up to `count` distinct items chosen at random. */
-export function sample<T>(items: readonly T[], count: number, rng: Rng): T[] {
-  return shuffle(items, rng).slice(0, Math.max(0, count));
-}
-
 export function randomSeed(): number {
   return (Date.now() ^ Math.floor(Math.random() * 0xffffffff)) >>> 0;
 }

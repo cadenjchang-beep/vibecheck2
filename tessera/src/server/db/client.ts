@@ -18,4 +18,3 @@ export type Db = typeof db;
 /** A transaction handle or the pool-backed database; services accept either. */
 export type Tx = Parameters<Parameters<Db['transaction']>[0]>[0] | Db;
 
-export { schema };

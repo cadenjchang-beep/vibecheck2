@@ -5,6 +5,7 @@ import { isActive, useMe, useUser } from './lib/me';
 import { syncCacheOwner, useUpdateNotice } from './lib/pwa';
 import { setOutboxUser } from './lib/outbox';
 import { RouteError } from './components/error-boundary';
+import { PreviewBanner } from './components/preview-banner';
 import { GuestOnly, RequireAuth } from './components/guards';
 
 /** Route-level code splitting: each page is its own chunk. */
@@ -30,6 +31,7 @@ function Root() {
   return (
     <>
       <RouteAnnouncer />
+      <PreviewBanner />
       <Outlet />
     </>
   );

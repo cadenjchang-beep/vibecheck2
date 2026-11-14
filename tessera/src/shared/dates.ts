@@ -53,10 +53,6 @@ export function localDay(date: Date, timeZone: string): string {
   return `${p.year}-${pad(p.month)}-${pad(p.day)}`;
 }
 
-export function localHour(date: Date, timeZone: string): number {
-  return partsIn(date, timeZone).hour;
-}
-
 export function addDays(day: string, amount: number): string {
   const [y, m, d] = day.split('-').map(Number) as [number, number, number];
   const date = new Date(Date.UTC(y, m - 1, d + amount));

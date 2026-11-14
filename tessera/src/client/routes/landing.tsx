@@ -7,8 +7,7 @@ import { Mosaic } from '@/components/mosaic';
 import { Button } from '@/components/ui/button';
 import { useI18n } from '@/lib/i18n';
 import { isActive, useMe } from '@/lib/me';
-import { BUILT } from '@/lib/built';
-import { AVAILABLE_MODES } from '@/lib/modes';
+import { MODES } from '@/lib/modes';
 import { usePageTitle } from '@/lib/page';
 import type { Stage } from '@shared/constants';
 import { PREMIUM_PRICE } from '@shared/entitlements';
@@ -55,15 +54,14 @@ export default function Landing() {
   usePageTitle(t('common.tagline'));
   const { data } = useMe();
   if (isActive(data?.user)) return <Navigate to="/home" replace />;
+  const aiOn = Boolean(data?.features.ai);
 
   const price = formatNumber(PREMIUM_PRICE.amount, { style: 'currency', currency: PREMIUM_PRICE.currency, maximumFractionDigits: 0 });
-  // Only what can actually be used today is described.
+  // AI can be switched off per deployment, so the first step only promises it when it is on.
   const steps = [
-    BUILT.ai ? { title: t('landing.how1Title'), body: t('landing.how1Body') } : { title: t('landing.how1TitleBasic'), body: t('landing.how1BodyBasic') },
+    aiOn ? { title: t('landing.how1Title'), body: t('landing.how1Body') } : { title: t('landing.how1TitleBasic'), body: t('landing.how1BodyBasic') },
     { title: t('landing.how2Title'), body: t('landing.how2Body') },
-    BUILT.review
-      ? { title: t('landing.how3Title'), body: t('landing.how3Body') }
-      : { title: t('landing.how3TitleBasic'), body: t('landing.how3BodyBasic') },
+    { title: t('landing.how3Title'), body: t('landing.how3Body') },
   ];
 
   return (
@@ -72,11 +70,9 @@ export default function Landing() {
       <header className="container-page flex h-16 items-center gap-2">
         <Logo />
         <div className="ms-auto flex items-center gap-1">
-          {BUILT.search ? (
-            <Button variant="ghost" asChild className="hidden sm:inline-flex">
-              <Link to="/browse">{t('nav.browse')}</Link>
-            </Button>
-          ) : null}
+          <Button variant="ghost" asChild className="hidden sm:inline-flex">
+            <Link to="/browse">{t('nav.browse')}</Link>
+          </Button>
           {/* Tighter on phones, where longer translations would not fit beside the logo. */}
           <Button variant="ghost" asChild className="px-2.5 text-sm sm:px-4 sm:text-[0.95rem]">
             <Link to="/login">{t('nav.logIn')}</Link>
@@ -91,16 +87,16 @@ export default function Landing() {
         <section className="container-page grid items-center gap-10 py-10 sm:py-16 lg:grid-cols-2 lg:gap-16 lg:py-24">
           <div>
             <h1 className="text-[2.6rem] leading-[1.05] font-extrabold sm:text-6xl">{t('landing.heroTitle')}</h1>
-            <p className="mt-5 max-w-xl text-lg text-muted-foreground sm:text-xl">{BUILT.review ? t('landing.heroBody') : t('landing.heroBodyBasic')}</p>
+            <p className="mt-5 max-w-xl text-lg text-muted-foreground sm:text-xl">{t('landing.heroBody')}</p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <Button size="lg" asChild>
                 <Link to="/signup">{t('landing.ctaPrimary')}</Link>
               </Button>
               <Button size="lg" variant="secondary" asChild>
-                {BUILT.search ? <Link to="/browse">{t('landing.ctaBrowse')}</Link> : <Link to="/login">{t('landing.ctaSecondary')}</Link>}
+                <Link to="/browse">{t('landing.ctaBrowse')}</Link>
               </Button>
             </div>
-            <p className="mt-4 text-sm text-muted-foreground">{BUILT.upgrade ? t('landing.trust') : t('landing.trustBasic')}</p>
+            <p className="mt-4 text-sm text-muted-foreground">{t('landing.trust')}</p>
           </div>
           <div className="relative">
             <div className="rounded-[2rem] border border-border bg-card p-5 shadow-card sm:p-7">
@@ -115,11 +111,11 @@ export default function Landing() {
         <section className="border-y border-border bg-muted/60 py-14 sm:py-20" aria-labelledby="modes-title">
           <div className="container-page">
             <h2 id="modes-title" className="text-3xl font-extrabold sm:text-4xl">
-              {AVAILABLE_MODES.length === 6 ? t('landing.modesTitle') : t('landing.modesTitleShort')}
+              {MODES.length === 6 ? t('landing.modesTitle') : t('landing.modesTitleShort')}
             </h2>
             <p className="mt-3 max-w-2xl text-lg text-muted-foreground">{t('landing.modesBody')}</p>
             <ul className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {AVAILABLE_MODES.map(({ mode, icon: Icon, label, description }) => (
+              {MODES.map(({ mode, icon: Icon, label, description }) => (
                 <li key={mode} className="rounded-2xl border border-border bg-card p-5 shadow-card">
                   <span className="flex size-11 items-center justify-center rounded-xl bg-primary-soft text-primary-soft-foreground" aria-hidden="true">
                     <Icon className="size-5.5" />
@@ -157,25 +153,21 @@ export default function Landing() {
               <h2 className="text-3xl font-extrabold">{t('landing.mosaicTitle')}</h2>
               <p className="mt-3 text-lg text-muted-foreground">{t('landing.mosaicBody')}</p>
             </div>
-            {BUILT.classes ? (
-              <div className="flex gap-4">
-                <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-primary-soft text-primary-soft-foreground" aria-hidden="true">
-                  <GraduationCap className="size-5.5" />
-                </span>
-                <div>
-                  <h2 className="text-2xl font-extrabold">{t('landing.teachersTitle')}</h2>
-                  <p className="mt-2 text-lg text-muted-foreground">{t('landing.teachersBody')}</p>
-                </div>
+            <div className="flex gap-4">
+              <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-primary-soft text-primary-soft-foreground" aria-hidden="true">
+                <GraduationCap className="size-5.5" />
+              </span>
+              <div>
+                <h2 className="text-2xl font-extrabold">{t('landing.teachersTitle')}</h2>
+                <p className="mt-2 text-lg text-muted-foreground">{t('landing.teachersBody')}</p>
               </div>
-            ) : (
-              <Mosaic stages={HERO_STAGES.slice(0, 56)} className="grid-cols-[repeat(14,minmax(0,1fr))] gap-1.5 self-center" />
-            )}
+            </div>
           </div>
         </section>
 
         <section className="container-page py-14 sm:py-20">
-          <h2 className={BUILT.upgrade ? 'text-3xl font-extrabold sm:text-4xl' : 'hidden'}>{t('landing.pricingTitle')}</h2>
-          <div className={BUILT.upgrade ? 'mt-8 grid gap-4 md:grid-cols-2' : 'hidden'}>
+          <h2 className="text-3xl font-extrabold sm:text-4xl">{t('landing.pricingTitle')}</h2>
+          <div className="mt-8 grid gap-4 md:grid-cols-2">
             <div className="rounded-3xl border border-border bg-card p-6 shadow-card sm:p-8">
               <h3 className="text-xl font-bold">{t('common.free')}</h3>
               <p className="mt-2 font-display text-4xl font-extrabold">
@@ -198,7 +190,7 @@ export default function Landing() {
               </p>
             </div>
           </div>
-          <div className={(BUILT.upgrade ? 'mt-14 ' : '') + 'flex flex-col items-center gap-5 text-center'}>
+          <div className="mt-14 flex flex-col items-center gap-5 text-center">
             <h2 className="text-3xl font-extrabold sm:text-4xl">{t('landing.finalTitle')}</h2>
             <Button size="lg" asChild>
               <Link to="/signup">{t('landing.ctaPrimary')}</Link>

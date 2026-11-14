@@ -6,7 +6,6 @@ import { BarChart, Heatmap } from '@/components/charts';
 import { Button } from '@/components/ui/button';
 import { Segmented } from '@/components/ui/controls';
 import { Alert, Skeleton } from '@/components/ui/feedback';
-import { BUILT } from '@/lib/built';
 import { useI18n } from '@/lib/i18n';
 import { useEntitlements, useErrorMessage } from '@/lib/me';
 import { MODES } from '@/lib/modes';
@@ -79,11 +78,9 @@ function Detailed() {
           {t('stats.detailedTitle')}
         </h2>
         <p className="mx-auto mt-1 max-w-lg text-muted-foreground">{t('stats.detailedLocked')}</p>
-        {BUILT.upgrade ? (
-          <Button asChild className="mt-4">
-            <Link to="/upgrade">{t('nav.upgrade')}</Link>
-          </Button>
-        ) : null}
+        <Button asChild className="mt-4">
+          <Link to="/upgrade">{t('nav.upgrade')}</Link>
+        </Button>
       </section>
     );
   }

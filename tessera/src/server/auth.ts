@@ -16,6 +16,13 @@ const DAY = 60 * 60 * 24;
 /** App-owned columns on `users`. None can be set through the auth endpoints. */
 const serverOnly = { input: false } as const;
 
+/**
+ * The client's address as this server resolved it (app.ts), passed to Better
+ * Auth for its rate limits. Always overwritten by the server, never trusted
+ * from the request.
+ */
+export const CLIENT_IP_HEADER = 'x-tessera-client-ip';
+
 export const auth = betterAuth({
   appName: APP_NAME,
   baseURL: env.appUrl,
@@ -112,7 +119,8 @@ export const auth = betterAuth({
     cookiePrefix: 'tessera',
     useSecureCookies: env.appUrl.startsWith('https://'),
     database: { generateId: () => newId() },
-    ipAddress: env.TRUST_PROXY ? { ipAddressHeaders: ['x-forwarded-for'] } : { ipAddressHeaders: [] },
+    // Resolved in app.ts from the socket, or X-Forwarded-For with TRUST_PROXY.
+    ipAddress: { ipAddressHeaders: [CLIENT_IP_HEADER] },
   },
 
   logger: {

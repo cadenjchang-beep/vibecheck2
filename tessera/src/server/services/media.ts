@@ -88,7 +88,7 @@ export async function uploadMedia(viewer: Viewer, kind: MediaKind, file: File): 
   return { id, url: `/api/media/${id}` };
 }
 
-export async function releaseStorage(userId: string, bytes: number): Promise<void> {
+async function releaseStorage(userId: string, bytes: number): Promise<void> {
   await db
     .update(storageUsage)
     .set({ bytes: sql`greatest(0, ${storageUsage.bytes} - ${bytes})` })

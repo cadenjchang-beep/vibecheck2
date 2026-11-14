@@ -6,7 +6,19 @@ like a mosaic as you learn it.
 
 > **Status:** all nine planned phases are built and tested. Simplifications,
 > things never run against live services, and suggested follow-ups are listed
-> in [`docs/STATUS.md`](docs/STATUS.md).
+> in [`docs/STATUS.md`](docs/STATUS.md). To show it to someone, run a
+> [preview](docs/DEPLOYMENT.md#preview); to put it online, see
+> [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md).
+
+## Try it in one command
+
+```bash
+docker compose -f compose.preview.yaml up --build
+```
+
+Then open http://localhost:4300 and pick a demo account on the login page.
+The preview needs no keys: AI and payments run in test mode, and it is kept
+out of search engines.
 
 This app lives in its own `tessera/` directory. The Golf Journal app at the
 repository root is separate and untouched.
@@ -129,6 +141,10 @@ The client needs none: it gets its configuration from `/api/me`.
 | `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT` | for web push | Generate a pair with `npx web-push generate-vapid-keys`; the subject is a `mailto:` address |
 | `RUN_SCHEDULER` | no (1) | Runs reminders and clean-up every few minutes inside the server. Set `0` on hosts with several instances and call the cron endpoint instead |
 | `CRON_SECRET` | with `RUN_SCHEDULER=0` | Sent as `x-cron-secret` to `POST /api/internal/cron` by your scheduler |
+| `APP_ENV` | no | `development`, `preview` or `production` (the default when `NODE_ENV=production`). Each mode's rules are in [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md#modes) |
+| `MIGRATE_ON_START` | no | Apply pending migrations when the server starts. Default on in preview |
+| `SEED_DEMO` | no | Load the demo accounts and sample sets at start-up. Default on in preview, refused in production |
+| `APP_VERSION` | no | Build identifier reported by `/api/health`; the Docker build sets it from the commit |
 
 ### Setting up the optional services
 
@@ -150,6 +166,7 @@ The client needs none: it gets its configuration from `/api/me`.
 | --- | --- |
 | `npm run dev` | API on :8787 and the web app on :5173, both reloading on change |
 | `npm run build` | Production build: client to `dist/client`, server to `dist/server` |
+| `npm run preview` | Builds and runs the app in preview mode on :4300 (demo data, test payments) |
 | `npm start` | Runs the built server, which serves the API and the web app |
 | `npm run typecheck` | TypeScript check of client, server, shared code and tests |
 | `npm test` | Unit tests and API tests |
@@ -159,6 +176,9 @@ The client needs none: it gets its configuration from `/api/me`.
 | `npm run db:generate` | Generates a SQL migration from `src/server/db/schema.ts` |
 | `npm run db:migrate` | Applies pending migrations |
 | `npm run db:seed` | Loads sample accounts and sets (safe to repeat) |
+| `npm run check` | Typecheck, translation catalogues, unused code and colour contrast, as CI runs them |
+| `npm run check:i18n` | Every translation key is used, and every key used exists |
+| `npm run check:unused` | Unused files, exports and dependencies (knip) |
 | `npm run check:contrast` | Checks the colour tokens against WCAG AA |
 | `node scripts/make-icons.mjs` | Re-renders the app icons and Open Graph image from the logo |
 
@@ -203,38 +223,21 @@ npm run test:e2e
 
 ## Production
 
+See [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md) for the checklist, Docker
+Compose on a single server, container platforms, and the CI pipeline that
+tests every change and publishes an image. In short:
+
 ```bash
-npm ci && npm run build
+cp .env.production.example .env.production
 ```
 
 ```bash
-NODE_ENV=production node dist/server/db/migrate.js
+docker compose --env-file .env.production up -d --build
 ```
 
-```bash
-NODE_ENV=production node dist/server/main.js
-```
-
-One Node process serves the API, the built web app and the server-rendered
-public set pages on `PORT`. Put it behind HTTPS (a reverse proxy or your
-platform's router; service workers and push need HTTPS), set `APP_URL` to the
-public `https://` origin, set `BETTER_AUTH_SECRET`, configure SMTP, and use
-S3-compatible storage if the host's disk is not persistent. `node_modules`
-must be present at runtime.
-
-Or with Docker, from this directory:
-
-```bash
-docker build -t tessera .
-```
-
-```bash
-docker run --rm --env-file .env.production tessera node dist/server/db/migrate.js
-```
-
-```bash
-docker run -p 8787:8787 --env-file .env.production tessera
-```
+Or without Docker: `npm ci && npm run build`, then
+`NODE_ENV=production node dist/server/db/migrate.js` once per release, and
+`NODE_ENV=production node dist/server/main.js` behind HTTPS.
 
 ## Layout
 
@@ -244,7 +247,9 @@ src/server/   Hono API, Drizzle schema, auth, services, server-rendered pages
 src/client/   React app: routes, components, i18n catalogues, offline outbox
 drizzle/      Generated SQL migrations
 tests/        API tests            e2e/  Browser tests
-docs/         Architecture, schema diagram, status and follow-ups
+scripts/      Build, preview, test-server and check scripts
+docs/         Architecture, deployment, status and follow-ups
+Dockerfile, compose.yaml, compose.preview.yaml   Container image and stacks
 ```
 
 See [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) for how the pieces fit and

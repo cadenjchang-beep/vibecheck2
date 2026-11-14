@@ -103,7 +103,7 @@ export async function selectSetSummaries(q: SummaryQuery, tx: Tx = db): Promise<
 
 const mediaRef = (id: string | null): MediaRef | null => (id ? { id, url: `/api/media/${id}` } : null);
 
-export function toCardDto(card: CardRow): CardDto {
+function toCardDto(card: CardRow): CardDto {
   return {
     id: card.id,
     position: card.position,
@@ -188,11 +188,11 @@ export async function getSetDetail(viewer: Viewer | null, setId: string, options
 
 // ── Cursors ──────────────────────────────────────────────────────────────────
 
-export function encodeCursor(parts: unknown[]): string {
+function encodeCursor(parts: unknown[]): string {
   return Buffer.from(JSON.stringify(parts)).toString('base64url');
 }
 
-export function decodeCursor(cursor: string | undefined): unknown[] | null {
+function decodeCursor(cursor: string | undefined): unknown[] | null {
   if (!cursor) return null;
   try {
     const parsed: unknown = JSON.parse(Buffer.from(cursor, 'base64url').toString('utf8'));

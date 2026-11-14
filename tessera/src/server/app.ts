@@ -3,10 +3,10 @@ import { bodyLimit } from 'hono/body-limit';
 import { secureHeaders } from 'hono/secure-headers';
 import { ZodError } from 'zod';
 import type { ApiErrorBody } from '@shared/api';
-import { auth } from './auth';
+import { auth, CLIENT_IP_HEADER } from './auth';
 import { env } from './env';
 import { HttpError } from './http/errors';
-import { originGuard, requestContext, sessionMiddleware, type AppEnv } from './http/context';
+import { clientIp, originGuard, parseJson, requestContext, sessionMiddleware, type AppEnv } from './http/context';
 import { reportError } from './log';
 import { mountSeoRoutes, renderPage } from './http/pages';
 import { mountClient } from './http/static';
@@ -20,7 +20,6 @@ import { reviewRoutes } from './routes/review';
 import { cardRoutes, setRoutes } from './routes/sets';
 import { studyRoutes } from './routes/study';
 import { enforceRateLimit } from './services/rate-limit';
-import { clientIp, parseJson } from './http/context';
 import { log } from './log';
 import { z } from 'zod';
 import { compress } from 'hono/compress';
@@ -57,6 +56,14 @@ export function createApp() {
     }),
   );
 
+  // Previews are for reviewers, not search engines.
+  if (!env.indexable) {
+    app.use(async (c, next) => {
+      await next();
+      c.header('x-robots-tag', 'noindex, nofollow');
+    });
+  }
+
   app.use('/api/*', compress());
   app.use('/api/*', originGuard);
   app.use('/api/*', async (c, next) => {
@@ -65,10 +72,14 @@ export function createApp() {
     if (!c.res.headers.has('cache-control')) c.header('cache-control', 'no-store');
   });
 
-  app.get('/api/health', (c) => c.json({ ok: true }));
+  app.get('/api/health', (c) => c.json({ ok: true, mode: env.appEnv, version: env.version }));
 
   // Better Auth owns sign-up, sign-in, OAuth, verification and password reset.
-  app.on(['GET', 'POST'], '/api/auth/*', bodyLimit({ maxSize: MB }), (c) => auth.handler(c.req.raw));
+  app.on(['GET', 'POST'], '/api/auth/*', bodyLimit({ maxSize: MB }), (c) => {
+    const headers = new Headers(c.req.raw.headers);
+    headers.set(CLIENT_IP_HEADER, clientIp(c));
+    return auth.handler(new Request(c.req.raw, { headers }));
+  });
 
   app.use('/api/*', sessionMiddleware);
   app.use('/api/*', bodyLimit({ maxSize: 12 * MB }));

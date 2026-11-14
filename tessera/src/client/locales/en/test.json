@@ -26,7 +26,6 @@
   "unansweredBody": "{count, plural, one {# question has} other {# questions have}} no answer and will be marked wrong.",
   "submitAnyway": "Submit anyway",
   "keepWorking": "Keep working",
-  "resultsTitle": "Your result",
   "scoreLabel": "Score: {score}%",
   "scoreSummary": "{points} of {max} correct",
   "gradeGreat": "Excellent work.",
@@ -40,7 +39,6 @@
   "markIncorrect": "Incorrect",
   "markUnanswered": "Not answered",
   "almostNote": "Close enough to count. Check the exact spelling.",
-  "yourMatch": "You chose",
   "retake": "Take a new test",
   "practiseMissed": "Practise with Learn"
 }

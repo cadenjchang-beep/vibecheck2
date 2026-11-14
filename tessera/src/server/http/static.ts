@@ -8,7 +8,7 @@ import type { AppEnv, Ctx } from './context';
 const CLIENT_DIR = './dist/client';
 
 /** The built single-page app's HTML shell, or null when the client is not built. */
-export function readIndexHtml(): string | null {
+function readIndexHtml(): string | null {
   const file = path.resolve(CLIENT_DIR, 'index.html');
   return existsSync(file) ? readFileSync(file, 'utf8') : null;
 }

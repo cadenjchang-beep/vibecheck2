@@ -2,10 +2,10 @@ import { z } from 'zod';
 import { LIMITS } from './constants';
 import type { Distractors } from './learn';
 
-export const AI_SUGGEST_KINDS = ['definition', 'example', 'mnemonic'] as const;
+const AI_SUGGEST_KINDS = ['definition', 'example', 'mnemonic'] as const;
 export type AiSuggestKind = (typeof AI_SUGGEST_KINDS)[number];
 
-export const AI_SOURCES = ['notes', 'topic', 'file'] as const;
+const AI_SOURCES = ['notes', 'topic', 'file'] as const;
 export type AiSource = (typeof AI_SOURCES)[number];
 
 /** How many cards one generation request may ask for. */

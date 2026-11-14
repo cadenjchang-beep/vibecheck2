@@ -1,14 +1,29 @@
 import { serve } from '@hono/node-server';
 import { createApp } from './app';
 import { pool } from './db/client';
+import { runMigrations } from './db/migrations';
 import { env } from './env';
 import { log, reportError } from './log';
 import { startScheduler } from './services/reminders';
 
+for (const warning of env.warnings) log.warn(warning);
+
+// Previews (and single-instance hosts that opt in) bring the database up to
+// date and load the demo data before taking traffic.
+if (env.migrateOnStart) {
+  await runMigrations();
+  log.info('migrations applied');
+}
+if (env.seedDemo) {
+  const { seedDemo } = await import('./db/demo');
+  await seedDemo();
+  log.info('demo accounts and sample sets ready');
+}
+
 const app = createApp();
 
 const server = serve({ fetch: app.fetch, port: env.PORT }, (info) => {
-  log.info({ port: info.port, env: env.NODE_ENV, appUrl: env.appUrl }, 'tessera api listening');
+  log.info({ port: info.port, mode: env.appEnv, node: env.NODE_ENV, version: env.version, appUrl: env.appUrl }, 'tessera listening');
 });
 
 if (env.RUN_SCHEDULER && !env.isTest) startScheduler();

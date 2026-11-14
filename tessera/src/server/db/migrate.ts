@@ -1,18 +1,12 @@
-import { migrate } from 'drizzle-orm/node-postgres/migrator';
-import { db, pool } from './client';
 import { log } from '../log';
+import { pool } from './client';
+import { runMigrations } from './migrations';
 
-/** Applies every pending SQL migration in ./drizzle. Safe to run on each deploy. */
-export async function runMigrations(): Promise<void> {
-  await migrate(db, { migrationsFolder: './drizzle' });
-}
-
-if (import.meta.url === `file://${process.argv[1]}`) {
-  runMigrations()
-    .then(() => log.info('migrations applied'))
-    .catch((err) => {
-      log.error({ err }, 'migration failed');
-      process.exitCode = 1;
-    })
-    .finally(() => pool.end());
-}
+// Command line: `npm run db:migrate`, or `node dist/server/db/migrate.js` in production.
+runMigrations()
+  .then(() => log.info('migrations applied'))
+  .catch((err) => {
+    log.error({ err }, 'migration failed');
+    process.exitCode = 1;
+  })
+  .finally(() => pool.end());

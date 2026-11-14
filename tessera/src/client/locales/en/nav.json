@@ -6,7 +6,6 @@
   "stats": "Stats",
   "search": "Search",
   "browse": "Browse",
-  "folders": "Folders",
   "classes": "Classes",
   "settings": "Settings",
   "upgrade": "Upgrade to Premium",
@@ -23,5 +22,6 @@
   "dueBadge": "{count, plural, one {# card due} other {# cards due}}",
   "privacy": "Privacy",
   "terms": "Terms",
-  "footerNote": "No ads from third parties. We never sell your data."
+  "footerNote": "No ads from third parties. We never sell your data.",
+  "footer": "Site links"
 }

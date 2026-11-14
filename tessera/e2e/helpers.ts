@@ -1,6 +1,7 @@
 import { readdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { expect, type Page } from '@playwright/test';
+import { DEMO_ACCOUNTS, DEMO_PASSWORD } from '../src/shared/demo';
 
 const OUTBOX = path.resolve('.data/e2e/outbox');
 
@@ -86,9 +87,9 @@ export function linkFrom(message: OutboxMessage): string {
 }
 
 export const DEMO = {
-  student: { email: 'demo@tessera.test', password: 'tessera-demo' },
-  teacher: { email: 'teacher@tessera.test', password: 'tessera-demo' },
-  premium: { email: 'premium@tessera.test', password: 'tessera-demo' },
+  student: { email: DEMO_ACCOUNTS.student.email, password: DEMO_PASSWORD },
+  teacher: { email: DEMO_ACCOUNTS.teacher.email, password: DEMO_PASSWORD },
+  premium: { email: DEMO_ACCOUNTS.premium.email, password: DEMO_PASSWORD },
 };
 
 export interface CardSeed {

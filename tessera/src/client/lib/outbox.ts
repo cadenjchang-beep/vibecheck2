@@ -103,7 +103,7 @@ export async function enqueue(items: Partial<Box>): Promise<void> {
   scheduleFlush(1200);
 }
 
-export function scheduleFlush(delay = 0): void {
+function scheduleFlush(delay = 0): void {
   clearTimeout(timer);
   timer = setTimeout(() => void flushOutbox(), delay);
 }

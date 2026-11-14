@@ -4,7 +4,7 @@ import { Slot } from 'radix-ui';
 import type { ButtonHTMLAttributes, Ref } from 'react';
 import { cn } from '@/lib/utils';
 
-export const buttonVariants = cva(
+const buttonVariants = cva(
   'inline-flex shrink-0 items-center justify-center gap-2 rounded-xl font-semibold whitespace-nowrap transition-colors select-none disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*=size-])]:size-[1.15em]',
   {
     variants: {

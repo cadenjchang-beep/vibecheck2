@@ -38,7 +38,6 @@
   "deleteConfirmTitle": "Delete your account for good?",
   "deleteConfirmBody": "Your sets, folders, classes and study history will be removed permanently.",
   "deletePassword": "Enter your password to confirm",
-  "deleteTypeEmail": "Type your email address to confirm",
   "deleteDone": "Your account has been deleted.",
   "newPassword": "New password",
   "renews": "Renews on {date}.",

@@ -14,7 +14,7 @@ import { anthropicProvider } from './anthropic';
 import { mockProvider } from './mock';
 import type { AiProvider, TokenUsage } from './provider';
 
-export function aiProvider(): AiProvider {
+function aiProvider(): AiProvider {
   if (env.aiProvider === 'anthropic') return anthropicProvider;
   if (env.aiProvider === 'mock') return mockProvider;
   throw new HttpError(503, 'ai_unavailable', 'AI features are not set up on this server.');

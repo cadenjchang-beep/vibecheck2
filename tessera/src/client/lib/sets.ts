@@ -1,7 +1,6 @@
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient, type QueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import type { CardDto, Page, SetDetail, SetSummary } from '@shared/api';
-import type { Stage } from '@shared/constants';
 import type { SetInput } from '@shared/schemas';
 import { api } from './api';
 import { useI18n } from './i18n';
@@ -151,12 +150,4 @@ export function useStarCard(setId: string) {
 /** A card can be studied once it has something on both sides. */
 export function isStudyable(card: CardDto): boolean {
   return Boolean((card.termPlain || card.termImage) && (card.definitionPlain || card.definitionImage));
-}
-
-export function stageOf(set: SetDetail, cardId: string): Stage {
-  return set.progress[cardId]?.stage ?? 'new';
-}
-
-export function setPath(set: Pick<SetSummary, 'id'>, mode?: string): string {
-  return mode ? `/sets/${set.id}/${mode}` : `/sets/${set.id}`;
 }

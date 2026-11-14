@@ -40,8 +40,7 @@ import { useI18n } from '@/lib/i18n';
 import { useAiAvailable, useWriteDistractors } from '@/lib/ai';
 import { isActive, useEntitlements, useErrorMessage, useUser } from '@/lib/me';
 import { downloadSet, removeDownload, useIsDownloaded } from '@/lib/pwa';
-import { BUILT } from '@/lib/built';
-import { AVAILABLE_MODES } from '@/lib/modes';
+import { MODES } from '@/lib/modes';
 import { usePageTitle } from '@/lib/page';
 import { isStudyable, useDeleteSet, useDuplicateSet, useSet, useStarCard, useStarSet } from '@/lib/sets';
 import { canSpeak, speak } from '@/lib/speech';
@@ -113,7 +112,7 @@ function Header({ set }: { set: SetDetail }) {
   const canStoreOffline = signedIn && typeof caches !== 'undefined';
   const toggleOffline = async () => {
     if (!entitlements.offlineDownloads) {
-      toast(t('sets.offlinePremium'), BUILT.upgrade ? { action: { label: t('nav.upgrade'), onClick: () => navigate('/upgrade') } } : undefined);
+      toast(t('sets.offlinePremium'), { action: { label: t('nav.upgrade'), onClick: () => navigate('/upgrade') } });
       return;
     }
     try {
@@ -228,12 +227,10 @@ function Header({ set }: { set: SetDetail }) {
                     <Copy aria-hidden="true" />
                     {t('sets.duplicate')}
                   </MenuItem>
-                  {BUILT.folders ? (
-                    <MenuItem onSelect={() => setFoldersOpen(true)}>
-                      <FolderPlus aria-hidden="true" />
-                      {t('sets.addToFolder')}
-                    </MenuItem>
-                  ) : null}
+                  <MenuItem onSelect={() => setFoldersOpen(true)}>
+                    <FolderPlus aria-hidden="true" />
+                    {t('sets.addToFolder')}
+                  </MenuItem>
                 </>
               ) : null}
               {aiAvailable && set.cards.length >= 2 ? (
@@ -284,8 +281,8 @@ function ModePicker({ set, studyable }: { set: SetDetail; studyable: number }) {
       <h2 id="study-title" className="sr-only">
         {t('sets.studyTitle')}
       </h2>
-      <ul className={cn('grid grid-cols-2 gap-3', AVAILABLE_MODES.length > 2 && 'sm:grid-cols-3 lg:grid-cols-6')}>
-        {AVAILABLE_MODES.map(({ mode, icon: Icon, label }) => {
+      <ul className={cn('grid grid-cols-2 gap-3', MODES.length > 2 && 'sm:grid-cols-3 lg:grid-cols-6')}>
+        {MODES.map(({ mode, icon: Icon, label }) => {
           const needed = MIN_CARDS[mode];
           const enabled = studyable >= needed;
           const body = (

@@ -32,10 +32,10 @@ export type StudyMode = (typeof STUDY_MODES)[number];
 export const ROLES = ['student', 'teacher'] as const;
 export type Role = (typeof ROLES)[number];
 
-export const PLANS = ['free', 'premium'] as const;
+const PLANS = ['free', 'premium'] as const;
 export type Plan = (typeof PLANS)[number];
 
-export const CONSENT_STATUSES = ['unknown', 'not_required', 'pending', 'granted'] as const;
+const CONSENT_STATUSES = ['unknown', 'not_required', 'pending', 'granted'] as const;
 export type ConsentStatus = (typeof CONSENT_STATUSES)[number];
 
 export const REMINDER_CHANNELS = ['off', 'email', 'push'] as const;
@@ -56,9 +56,6 @@ export const LIMITS = {
   aiUploadBytes: 8 * 1024 * 1024,
   pageSize: 24,
 } as const;
-
-export const IMAGE_MIME_TYPES = ['image/png', 'image/jpeg', 'image/webp', 'image/gif'] as const;
-export const AUDIO_MIME_TYPES = ['audio/mpeg', 'audio/mp4', 'audio/wav', 'audio/ogg', 'audio/webm'] as const;
 
 /**
  * Languages offered for a set's term and definition sides. Codes are BCP 47 and

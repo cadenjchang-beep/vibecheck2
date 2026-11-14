@@ -3,7 +3,6 @@
   "subtitle": "Tell us a little about yourself so we can set things up properly.",
   "finish": "Start studying",
   "waitingTitle": "Waiting for a parent or guardian",
-  "waitingBody": "We emailed {email} a link to approve your account. Ask them to check their inbox (and the spam folder). You can start as soon as they approve.",
   "waitingBodyNoEmail": "We emailed your parent or guardian a link to approve your account. You can start as soon as they approve.",
   "waitingCheck": "I've been approved",
   "waitingNotYet": "Not approved yet. Ask your parent or guardian to open the email from Tessera.",

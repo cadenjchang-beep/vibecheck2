@@ -9,12 +9,11 @@ import { Alert } from '@/components/ui/feedback';
 import { Field, Input } from '@/components/ui/input';
 import { authClient, authErrorCode } from '@/lib/auth';
 import { useBilling, useBillingRedirect } from '@/lib/billing';
-import { BUILT } from '@/lib/built';
 import { useI18n } from '@/lib/i18n';
 import { useFeatures, useRefreshMe } from '@/lib/me';
 import { clearUserCaches } from '@/lib/pwa';
 import { queryClient } from '@/lib/query';
-import { SettingsCard } from '@/routes/settings';
+import { SettingsCard } from './card';
 
 function PlanCard({ user }: { user: MeUser }) {
   const { t, formatDate } = useI18n();
@@ -54,7 +53,7 @@ function PlanCard({ user }: { user: MeUser }) {
             {t('settings.manageBilling')}
           </Button>
         ) : null}
-        {!premium && BUILT.upgrade ? (
+        {!premium ? (
           <Button asChild>
             <Link to="/upgrade">{t('settings.seePremium')}</Link>
           </Button>

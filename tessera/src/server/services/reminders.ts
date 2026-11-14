@@ -90,7 +90,7 @@ export async function runReminders(now = new Date()): Promise<number> {
 const THIRTY_DAYS = 30 * 86_400_000;
 
 /** Permanently removes what was deleted more than thirty days ago. */
-export async function purgeDeleted(now = new Date()): Promise<void> {
+async function purgeDeleted(now = new Date()): Promise<void> {
   const cutoff = new Date(now.getTime() - THIRTY_DAYS);
   await db.delete(sets).where(lt(sets.deletedAt, cutoff));
   await db.delete(folders).where(lt(folders.deletedAt, cutoff));

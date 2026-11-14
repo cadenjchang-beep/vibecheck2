@@ -24,7 +24,11 @@
     "check:contrast": "node scripts/check-contrast.mjs",
     "e2e:serve": "node scripts/e2e-server.mjs",
     "test:unit": "vitest run --project unit",
-    "test:api": "vitest run --project api"
+    "test:api": "vitest run --project api",
+    "check:i18n": "node scripts/check-i18n.mjs",
+    "check:unused": "knip --no-progress",
+    "check": "npm run typecheck && npm run check:i18n && npm run check:unused && npm run check:contrast",
+    "preview": "node scripts/preview.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^1.8.0",
@@ -70,6 +74,7 @@
     "concurrently": "^10.0.7",
     "drizzle-kit": "^0.31.11",
     "esbuild": "^0.28.2",
+    "knip": "6.45.1",
     "pino-pretty": "^13.2.0",
     "tailwindcss": "^4.3.5",
     "tsx": "^4.23.15",

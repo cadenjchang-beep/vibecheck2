@@ -7,7 +7,6 @@ import { SessionSummary, StudyGate, StudyShell } from '@/components/study/shell'
 import { Button } from '@/components/ui/button';
 import { Segmented, Switch, ToggleRow, Tooltip } from '@/components/ui/controls';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
-import { BUILT } from '@/lib/built';
 import { useI18n } from '@/lib/i18n';
 import { isStudyable, useStarCard } from '@/lib/sets';
 import { canSpeak, speak, stopSpeaking } from '@/lib/speech';
@@ -405,7 +404,7 @@ function Flashcards({ set }: { set: SetDetail }) {
           }
           steps={[
             { to: `/sets/${set.id}/learn`, label: t('flashcards.tryLearn'), icon: <Brain aria-hidden="true" /> },
-            ...(BUILT.test ? [{ to: `/sets/${set.id}/test`, label: t('flashcards.tryTest'), icon: <ClipboardCheck aria-hidden="true" /> }] : []),
+            { to: `/sets/${set.id}/test`, label: t('flashcards.tryTest'), icon: <ClipboardCheck aria-hidden="true" /> },
           ]}
         />
         {options}

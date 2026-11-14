@@ -21,7 +21,7 @@ export interface ReviewQueue {
   nextDueAt: string | null;
 }
 
-export const DEFAULT_NEW_PER_SESSION = 10;
+const DEFAULT_NEW_PER_SESSION = 10;
 
 export function buildReviewQueue(candidates: ReviewCandidate[], now: Date, newLimit = DEFAULT_NEW_PER_SESSION): ReviewQueue {
   const due = candidates

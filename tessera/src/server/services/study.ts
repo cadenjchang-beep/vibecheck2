@@ -293,7 +293,7 @@ export async function syncStudy(viewer: Viewer, input: SyncInput): Promise<SyncR
 }
 
 /** Recomputes the streak from the days that have activity, which also absorbs late offline syncs. */
-export async function refreshStreak(tx: Tx, viewer: Pick<Viewer, 'id' | 'timezone'>): Promise<{ current: number; longest: number }> {
+async function refreshStreak(tx: Tx, viewer: Pick<Viewer, 'id' | 'timezone'>): Promise<{ current: number; longest: number }> {
   const rows = await tx
     .select({ day: dailyActivity.day })
     .from(dailyActivity)

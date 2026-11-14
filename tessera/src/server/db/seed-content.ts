@@ -4,7 +4,7 @@ import { toViewer } from '../http/context';
 import { createSet } from '../services/sets';
 import { db } from './client';
 import { sets, users } from './schema';
-import { SEED_USERS } from './seed';
+import { SEED_USERS } from './demo';
 
 interface SeedSet {
   title: string;

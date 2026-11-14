@@ -1,5 +1,4 @@
 import type { MediaRef } from '@shared/api';
-import { LIMITS } from '@shared/constants';
 import { api } from './api';
 
 const MAX_EDGE = 1600;
@@ -38,5 +37,3 @@ export const MEDIA_ACCEPT = {
   image: 'image/png,image/jpeg,image/webp,image/gif',
   audio: 'audio/mpeg,audio/mp4,audio/x-m4a,audio/wav,audio/ogg,audio/webm,.mp3,.m4a,.wav,.ogg,.webm',
 } as const;
-
-export const MEDIA_LIMIT = { image: LIMITS.imageBytes, audio: LIMITS.audioBytes } as const;

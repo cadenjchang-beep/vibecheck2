@@ -15,7 +15,7 @@ import { Dialog, DialogContent } from './ui/dialog';
 import { Alert } from './ui/feedback';
 import { Input } from './ui/input';
 
-export async function copyText(text: string): Promise<boolean> {
+async function copyText(text: string): Promise<boolean> {
   try {
     await navigator.clipboard.writeText(text);
     return true;

@@ -1,7 +1,7 @@
 import type { BillingStatus } from '@shared/api';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { api } from './api';
-import { useErrorMessage, useUser } from './me';
+import { useErrorMessage } from './me';
 import { keys } from './query';
 import { toast } from 'sonner';
 
@@ -16,8 +16,4 @@ export function useBillingRedirect(kind: 'checkout' | 'portal') {
     onSuccess: ({ url }) => window.location.assign(url),
     onError: (err) => toast.error(errorMessage(err)),
   });
-}
-
-export function useIsPremium(): boolean {
-  return useUser()?.plan === 'premium';
 }

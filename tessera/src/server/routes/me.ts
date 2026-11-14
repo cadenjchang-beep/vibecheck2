@@ -16,13 +16,14 @@ import { sendEmail } from '../services/email/transport';
 import { exportAccountData } from '../services/account';
 import { enforceRateLimit } from '../services/rate-limit';
 
-export const features: Features = {
+const features: Features = {
   googleAuth: env.googleEnabled,
   ai: env.aiProvider !== 'off',
   aiMock: env.aiProvider === 'mock',
   payments: env.paymentsProvider,
   push: env.pushEnabled,
   vapidPublicKey: env.VAPID_PUBLIC_KEY ?? null,
+  environment: env.appEnv,
 };
 
 const CONSENT_TTL_MS = 14 * 24 * 60 * 60 * 1000;

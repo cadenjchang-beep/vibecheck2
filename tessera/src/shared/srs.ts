@@ -21,7 +21,6 @@ import { addDays, localDay, startOfDay } from './dates';
 
 export const RATINGS = [1, 2, 3, 4] as const;
 export type Rating = (typeof RATINGS)[number];
-export const RATING_NAMES: Record<Rating, 'again' | 'hard' | 'good' | 'easy'> = { 1: 'again', 2: 'hard', 3: 'good', 4: 'easy' };
 
 export const DEFAULT_EASE = 2.5;
 export const MIN_EASE = 1.3;

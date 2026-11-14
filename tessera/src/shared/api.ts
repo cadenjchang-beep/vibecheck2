@@ -35,6 +35,8 @@ export interface Features {
   payments: 'stripe' | 'mock' | 'off';
   push: boolean;
   vapidPublicKey: string | null;
+  /** Deployment mode: previews show a banner and offer the demo accounts. */
+  environment: 'development' | 'preview' | 'production';
 }
 
 export interface MeResponse {

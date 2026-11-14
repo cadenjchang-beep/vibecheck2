@@ -11,7 +11,6 @@ import type { Distractors } from '@shared/learn';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useCallback } from 'react';
 import { api, ApiError } from './api';
-import { BUILT } from './built';
 import { useFeatures, useUser } from './me';
 import { keys } from './query';
 
@@ -19,7 +18,7 @@ import { keys } from './query';
 export function useAiAvailable(): boolean {
   const features = useFeatures();
   const user = useUser();
-  return BUILT.ai && Boolean(features?.ai) && Boolean(user);
+  return Boolean(features?.ai) && Boolean(user);
 }
 
 export function useAiUsage(enabled = true) {
@@ -66,21 +65,11 @@ export function useDistractors(setId: string | undefined): Distractors | undefin
   const { data } = useQuery({
     queryKey: distractorKey(setId ?? ''),
     queryFn: () => api<AiDistractorsResponse>(`/api/ai/distractors/${setId}`),
-    enabled: Boolean(setId) && BUILT.ai && Boolean(features?.ai),
+    enabled: Boolean(setId) && Boolean(features?.ai),
     staleTime: 5 * 60_000,
     retry: false,
   });
   return data?.distractors;
-}
-
-export function useDistractorStatus(setId: string, enabled: boolean) {
-  return useQuery({
-    queryKey: distractorKey(setId),
-    queryFn: () => api<AiDistractorsResponse>(`/api/ai/distractors/${setId}`),
-    enabled,
-    staleTime: 5 * 60_000,
-    retry: false,
-  });
 }
 
 export function useWriteDistractors(setId: string) {

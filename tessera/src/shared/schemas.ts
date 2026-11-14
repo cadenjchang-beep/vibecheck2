@@ -7,7 +7,7 @@ const id = z.string().min(8).max(40).regex(/^[A-Za-z0-9_-]+$/);
 const optionalId = id.nullable().optional();
 const language = z.string().refine((v) => LANGUAGE_CODES.includes(v), 'Unsupported language');
 
-export const cardInputSchema = z.object({
+const cardInputSchema = z.object({
   /** Present for a card that already exists; omitted for a new one. */
   id: optionalId,
   // Checked again, against the stored length, once the markup is sanitised.
@@ -47,7 +47,7 @@ export const listQuerySchema = z.object({
 const uuid = z.string().regex(/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i, 'Expected a UUID');
 const eventBase = { id: uuid, cardId: id, setId: id, at: z.string().datetime() };
 
-export const studyEventSchema = z.discriminatedUnion('type', [
+const studyEventSchema = z.discriminatedUnion('type', [
   z.object({
     ...eventBase,
     type: z.literal('answer'),
@@ -63,7 +63,7 @@ export const studyEventSchema = z.discriminatedUnion('type', [
   }),
 ]);
 
-export const sessionInputSchema = z.object({
+const sessionInputSchema = z.object({
   clientId: uuid,
   setId: id.nullable(),
   mode: z.enum(STUDY_MODES),
@@ -77,7 +77,7 @@ export const sessionInputSchema = z.object({
   details: z.record(z.string(), z.unknown()).optional(),
 });
 
-export const matchScoreInputSchema = z.object({
+const matchScoreInputSchema = z.object({
   clientId: uuid,
   setId: id,
   timeMs: z.number().int().min(1000).max(3_600_000),

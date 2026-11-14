@@ -29,7 +29,7 @@ const loaders: Record<Exclude<UiLocale, 'en'>, () => Promise<{ default: Messages
 const STORAGE_KEY = 'tessera.locale';
 const isLocale = (v: unknown): v is UiLocale => UI_LOCALES.some((l) => l.code === v);
 
-export function detectLocale(): UiLocale {
+function detectLocale(): UiLocale {
   try {
     const stored = localStorage.getItem(STORAGE_KEY);
     if (isLocale(stored)) return stored;
@@ -62,7 +62,7 @@ function matchBrace(text: string, open: number): number {
   return -1;
 }
 
-export function formatMessage(template: string, vars: MessageVars | undefined, locale: string): string {
+function formatMessage(template: string, vars: MessageVars | undefined, locale: string): string {
   if (!template.includes('{')) return template;
   let out = '';
   let i = 0;

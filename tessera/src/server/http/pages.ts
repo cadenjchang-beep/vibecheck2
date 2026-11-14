@@ -140,12 +140,15 @@ const PRIVATE_PATHS = [
 
 export function mountSeoRoutes(app: Hono<AppEnv>): void {
   app.get('/robots.txt', (c) => {
-    const lines = ['User-agent: *', 'Allow: /', ...PRIVATE_PATHS.map((p) => `Disallow: ${p}`), `Sitemap: ${env.appUrl}/sitemap.xml`];
+    const lines = env.indexable
+      ? ['User-agent: *', 'Allow: /', ...PRIVATE_PATHS.map((p) => `Disallow: ${p}`), `Sitemap: ${env.appUrl}/sitemap.xml`]
+      : ['User-agent: *', 'Disallow: /'];
     c.header('cache-control', 'public, max-age=3600');
     return c.text(`${lines.join('\n')}\n`);
   });
 
   app.get('/sitemap.xml', async (c) => {
+    if (!env.indexable) return c.text('Not found', 404);
     const result = await db.execute<{ id: string; updated_at: Date }>(sql`
       select id, updated_at from sets
       where visibility = 'public' and deleted_at is null and card_count > 0

@@ -46,10 +46,6 @@ export function entitlementsFor(plan: Plan): Entitlements {
   return plan === 'premium' ? PREMIUM : FREE;
 }
 
-export function hasFeature(entitlements: Entitlements, feature: Feature): boolean {
-  return entitlements[feature];
-}
-
 /** A premium plan that has run past its paid period counts as free. */
 export function effectivePlan(plan: string, planExpiresAt: Date | string | null | undefined, now = new Date()): Plan {
   if (plan !== 'premium') return 'free';

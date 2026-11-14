@@ -173,7 +173,10 @@ before they join.
   `HttpOnly`, `SameSite=Lax`. State-changing requests must come from the app's
   own origin. Responses carry a strict Content Security Policy in production.
 - **Abuse limits.** One fixed-window rate limiter backed by PostgreSQL, so
-  limits hold across instances; used by auth and by write endpoints.
+  limits hold across instances; used by auth and by write endpoints. The
+  client address comes from the socket, or `X-Forwarded-For` only when
+  `TRUST_PROXY` is set, and is handed to Better Auth in a header the server
+  always overwrites.
 - **Uploads.** Type is decided from the file's bytes, not its name; only known
   image and audio formats are stored; quotas are reserved atomically.
 - **Younger users.** Under-13 accounts are locked until a parent approves by
@@ -187,6 +190,16 @@ before they join.
   database, removes their uploaded files and cancels billing. Data cached on
   the device is cleared at sign-out. The free plan's promotion slot only ever
   promotes Premium: there is no third-party advertising or tracking.
+
+## Configuration and deployment modes
+
+`src/server/config.ts` reads every setting through one Zod schema in a pure
+`parseEnv` function (unit-tested), and `env.ts` applies it to the process.
+`APP_ENV` selects development, preview or production; the mode decides which
+test providers are allowed, whether demo data and start-up migrations run,
+whether search engines may index the site, and which missing secrets are
+fatal. The client learns the mode from `/api/me` and shows a banner and
+demo sign-in in previews. See `docs/DEPLOYMENT.md`.
 
 ## Request lifecycle
 

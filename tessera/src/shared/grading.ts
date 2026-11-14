@@ -40,7 +40,7 @@ export function normalizeAnswer(text: string): string {
 }
 
 /** Removes accents and other combining marks: "está" → "esta". */
-export function stripDiacritics(text: string): string {
+function stripDiacritics(text: string): string {
   return text.normalize('NFD').replace(/\p{M}+/gu, '').normalize('NFC');
 }
 
