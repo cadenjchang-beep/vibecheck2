@@ -163,9 +163,52 @@ class NetlifyBlobsStorage implements StorageDriver {
   }
 }
 
+/** Files in the database's stored_files table: no extra service or disk needed. */
+export class DatabaseStorage implements StorageDriver {
+  async put(key: string, data: Uint8Array, contentType: string): Promise<void> {
+    assertSafeKey(key);
+    const { db } = await import('../../db/client');
+    const { storedFiles } = await import('../../db/schema');
+    await db
+      .insert(storedFiles)
+      .values({ key, contentType, data: Buffer.from(data) })
+      .onConflictDoUpdate({ target: storedFiles.key, set: { contentType, data: Buffer.from(data) } });
+  }
+
+  async get(key: string, range?: ByteRange): Promise<StoredObject | null> {
+    assertSafeKey(key);
+    const { db } = await import('../../db/client');
+    const { storedFiles } = await import('../../db/schema');
+    const { eq } = await import('drizzle-orm');
+    const [row] = await db.select({ data: storedFiles.data }).from(storedFiles).where(eq(storedFiles.key, key)).limit(1);
+    if (!row) return null;
+    const bytes = new Uint8Array(row.data);
+    const total = bytes.length;
+    let slice = bytes;
+    let served: { start: number; end: number } | undefined;
+    if (range && total > 0) {
+      const start = Math.min(range.start, total - 1);
+      const end = Math.min(range.end ?? total - 1, total - 1);
+      slice = bytes.subarray(start, end + 1);
+      served = { start, end };
+    }
+    return { body: new Blob([slice]).stream(), size: slice.length, total, range: served };
+  }
+
+  async delete(key: string): Promise<void> {
+    assertSafeKey(key);
+    const { db } = await import('../../db/client');
+    const { storedFiles } = await import('../../db/schema');
+    const { eq } = await import('drizzle-orm');
+    await db.delete(storedFiles).where(eq(storedFiles.key, key));
+  }
+}
+
 export const storage: StorageDriver =
   env.STORAGE_DRIVER === 's3'
     ? new S3Storage()
     : env.STORAGE_DRIVER === 'netlify'
       ? new NetlifyBlobsStorage()
-      : new LocalStorage(path.resolve(env.STORAGE_LOCAL_DIR));
+      : env.STORAGE_DRIVER === 'database'
+        ? new DatabaseStorage()
+        : new LocalStorage(path.resolve(env.STORAGE_LOCAL_DIR));

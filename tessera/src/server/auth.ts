@@ -1,4 +1,5 @@
 import { betterAuth } from 'better-auth';
+import { APIError } from 'better-auth/api';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
 import { APP_NAME } from '@shared/constants';
 import { db } from './db/client';
@@ -11,6 +12,7 @@ import { sendEmail } from './services/email/transport';
 import { consumeRateLimit } from './services/rate-limit';
 import { beforeAccountDeletion } from './services/account';
 import { isAllowedOrigin } from './http/origins';
+import { ownerSignUp } from './owner';
 
 const DAY = 60 * 60 * 24;
 
@@ -62,6 +64,8 @@ export const auth = betterAuth({
     autoSignInAfterVerification: true,
     expiresIn: DAY,
     sendVerificationEmail: async ({ user, url }) => {
+      // Owner accounts are confirmed from the start.
+      if (user.emailVerified) return;
       await sendEmail(verificationEmail(user, url));
     },
   },
@@ -69,6 +73,19 @@ export const auth = betterAuth({
   socialProviders: env.googleEnabled
     ? { google: { clientId: env.GOOGLE_CLIENT_ID!, clientSecret: env.GOOGLE_CLIENT_SECRET! } }
     : {},
+
+  databaseHooks: {
+    user: {
+      create: {
+        // Owner mode (OWNER_EMAIL): only the owner may sign up, and starts with Premium.
+        before: async (user) => {
+          const result = ownerSignUp(user);
+          if (!result.allowed) throw new APIError('FORBIDDEN', { code: 'SIGNUPS_CLOSED', message: 'Sign-ups are closed on this site.' });
+          return { data: result.data };
+        },
+      },
+    },
+  },
 
   account: {
     // Google verifies addresses, so a Google sign-in may join an existing

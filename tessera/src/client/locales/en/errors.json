@@ -31,5 +31,6 @@
   "ai_busy": "The AI is busy right now. Try again in a minute.",
   "ai_failed": "The AI couldn't do that. Try again, or try different material.",
   "ai_refused": "The AI declined this request. Try different material.",
-  "ai_quota_exceeded": "You've used all your AI requests for this month."
+  "ai_quota_exceeded": "You've used all your AI requests for this month.",
+  "signups_closed": "Sign-ups are closed on this site."
 }
