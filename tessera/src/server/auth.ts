@@ -10,6 +10,7 @@ import { resetPasswordEmail, verificationEmail } from './services/email/template
 import { sendEmail } from './services/email/transport';
 import { consumeRateLimit } from './services/rate-limit';
 import { beforeAccountDeletion } from './services/account';
+import { isAllowedOrigin } from './http/origins';
 
 const DAY = 60 * 60 * 24;
 
@@ -28,7 +29,11 @@ export const auth = betterAuth({
   baseURL: env.appUrl,
   basePath: '/api/auth',
   secret: env.authSecret,
-  trustedOrigins: [env.appUrl],
+  trustedOrigins: (request) => {
+    const origin = request?.headers.get('origin');
+    const hosts = [request?.headers.get('host'), request?.headers.get('x-forwarded-host')];
+    return [env.appUrl, origin && isAllowedOrigin(origin, hosts, env) ? origin : null];
+  },
   telemetry: { enabled: false },
 
   database: drizzleAdapter(db, {

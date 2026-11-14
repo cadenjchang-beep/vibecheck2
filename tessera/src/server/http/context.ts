@@ -9,6 +9,7 @@ import { env } from '../env';
 import { log, type Logger } from '../log';
 import { newId } from '../ids';
 import { badRequest, forbidden, unauthorized } from './errors';
+import { isAllowedOrigin } from './origins';
 
 /** The signed-in person making the request, with plan and age rules resolved. */
 export interface Viewer {
@@ -129,7 +130,8 @@ export const originGuard = createMiddleware<AppEnv>(async (c, next) => {
   if (ORIGIN_EXEMPT.some((p) => c.req.path.startsWith(p))) return next();
   const origin = c.req.header('origin');
   const site = c.req.header('sec-fetch-site');
-  if (origin ? origin !== env.appUrl : Boolean(site && site !== 'same-origin' && site !== 'none')) {
+  const hosts = [c.req.header('host'), c.req.header('x-forwarded-host')];
+  if (origin ? !isAllowedOrigin(origin, hosts, env) : Boolean(site && site !== 'same-origin' && site !== 'none')) {
     throw forbidden('bad_origin', 'Cross-site request blocked.');
   }
   return next();
