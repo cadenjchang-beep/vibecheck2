@@ -4,6 +4,7 @@ import { pool } from './db/client';
 import { runMigrations } from './db/migrations';
 import { env } from './env';
 import { log, reportError } from './log';
+import { ownerEmails, syncOwnerAccounts } from './owner';
 import { startScheduler } from './services/reminders';
 
 for (const warning of env.warnings) log.warn(warning);
@@ -14,6 +15,7 @@ if (env.migrateOnStart) {
   await runMigrations();
   log.info('migrations applied');
 }
+if (ownerEmails.length) await syncOwnerAccounts();
 if (env.seedDemo) {
   const { seedDemo } = await import('./db/demo');
   await seedDemo();

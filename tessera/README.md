@@ -20,6 +20,10 @@ Then open http://localhost:4300 and pick a demo account on the login page.
 The preview needs no keys: AI and payments run in test mode, and it is kept
 out of search engines.
 
+The simplest way to put it online just for yourself is **Render**: one
+account, one click, its own database, and Premium for your account
+(see [`docs/DEPLOYMENT.md#render`](docs/DEPLOYMENT.md#render)).
+
 To host it on **Netlify**, follow [`docs/DEPLOYMENT.md#netlify`](docs/DEPLOYMENT.md#netlify):
 set the base directory to `tessera`, connect a database, and deploy. Pull
 requests then get their own preview deploys with demo data.
@@ -149,6 +153,8 @@ The client needs none: it gets its configuration from `/api/me`.
 | `MIGRATE_ON_START` | no | Apply pending migrations when the server starts. Default on in preview |
 | `SEED_DEMO` | no | Load the demo accounts and sample sets at start-up. Default on in preview, refused in production |
 | `APP_VERSION` | no | Build identifier reported by `/api/health`; the Docker build sets it from the commit |
+| `OWNER_EMAIL` | no | Owner mode: only these addresses (comma-separated) can sign up, and they get Premium and a confirmed email |
+| `STORAGE_DRIVER=database` | no | Keeps uploads in PostgreSQL, for hosts without a persistent disk |
 
 ### Setting up the optional services
 

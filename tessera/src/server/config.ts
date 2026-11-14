@@ -14,7 +14,9 @@ const optional = z
 const schema = z.object({
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
   PORT: z.coerce.number().int().positive().default(8787),
-  APP_URL: z.string().url().default('http://localhost:5173'),
+  APP_URL: z.string().url().optional(),
+  /** Set by Render to the service's public address. */
+  RENDER_EXTERNAL_URL: optional,
   DATABASE_URL: z.string().min(1, 'DATABASE_URL is required'),
   BETTER_AUTH_SECRET: optional,
   LOG_LEVEL: z.enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace', 'silent']).default('info'),
@@ -27,7 +29,7 @@ const schema = z.object({
   SMTP_URL: optional,
   EMAIL_FROM: z.string().default('Tessera <no-reply@localhost>'),
 
-  STORAGE_DRIVER: z.enum(['local', 's3', 'netlify']).default('local'),
+  STORAGE_DRIVER: z.enum(['local', 's3', 'netlify', 'database']).default('local'),
   STORAGE_LOCAL_DIR: z.string().default('.data/uploads'),
   S3_BUCKET: optional,
   S3_REGION: z.string().default('auto'),
@@ -65,6 +67,8 @@ const schema = z.object({
   SEED_DEMO: optional,
   /** Build identifier reported by /api/health, such as a commit hash. */
   APP_VERSION: optional,
+  /** Owner mode: only these addresses (comma-separated) may sign up, and they get Premium. */
+  OWNER_EMAIL: optional,
   /** Database connections per server instance. Keep it small on serverless hosts. */
   DATABASE_POOL_MAX: z.coerce.number().int().min(1).max(100).default(10),
   /** How long one AI request may take. Serverless hosts cut requests off sooner. */
@@ -99,6 +103,8 @@ export function parseEnv(source: Record<string, string | undefined>) {
   const preview = appEnv === 'preview';
   const production = appEnv === 'production';
   const warnings: string[] = [];
+  // Render tells the service its own address; elsewhere it is set or defaults to local development.
+  const appUrl = new URL(e.APP_URL ?? e.RENDER_EXTERNAL_URL ?? 'http://localhost:5173').origin;
 
   if (production && !isProd) throw new Error('APP_ENV=production needs NODE_ENV=production.');
 
@@ -113,7 +119,7 @@ export function parseEnv(source: Record<string, string | undefined>) {
       authSecret = 'dev-only-secret-change-me-please-32chars';
     }
   }
-  if (production && !e.APP_URL.startsWith('https://')) {
+  if (production && !appUrl.startsWith('https://')) {
     warnings.push('APP_URL is not https: secure cookies, the service worker and push notifications need HTTPS.');
   }
   if (e.STORAGE_DRIVER === 's3' && (!e.S3_BUCKET || !e.S3_ACCESS_KEY_ID || !e.S3_SECRET_ACCESS_KEY)) {
@@ -162,7 +168,7 @@ export function parseEnv(source: Record<string, string | undefined>) {
     version: e.APP_VERSION ?? 'dev',
     warnings,
     // Only the origin: a path here would move every route, sign-in included.
-    appUrl: new URL(e.APP_URL).origin,
+    appUrl,
     authSecret,
     emailTransport,
     aiProvider: aiProvider as 'anthropic' | 'mock' | 'off',

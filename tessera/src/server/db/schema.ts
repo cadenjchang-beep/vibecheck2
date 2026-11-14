@@ -151,6 +151,20 @@ export const parentalConsents = pgTable(
 
 // ── Content ──────────────────────────────────────────────────────────────────
 
+const bytea = customType<{ data: Buffer }>({ dataType: () => 'bytea' });
+
+/**
+ * Uploaded files kept in the database itself (STORAGE_DRIVER=database), for
+ * hosts without a persistent disk where a separate storage service would be
+ * one more account to set up. Fine for one person's images and audio.
+ */
+export const storedFiles = pgTable('stored_files', {
+  key: text('key').primaryKey(),
+  contentType: text('content_type').notNull(),
+  data: bytea('data').notNull(),
+  createdAt: createdAt(),
+});
+
 export const media = pgTable(
   'media',
   {
